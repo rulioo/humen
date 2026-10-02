@@ -1,0 +1,859 @@
+<title>农业门槛取证</title>
+<style>
+  :root{
+    --ground:#F5F7F7; --surface:#FFFFFF; --surface-2:#EDF1F1;
+    --line:#DCE3E3; --line-strong:#C3CFCF;
+    --ink:#121A1C; --ink-2:#415053; --muted:#6C7C7F;
+    --accent:#0C6E78; --accent-soft:#DDEBEC;
+    --fail:#9E3E19; --fail-soft:#F7E5DD;
+    --pass:#2C6349; --pass-soft:#DDEBE3;
+    --warn:#7E5F10; --warn-soft:#F5EBD3;
+    --font-body:"Source Han Sans SC","Noto Sans SC","PingFang SC","Microsoft YaHei",system-ui,sans-serif;
+    --font-display:"Source Han Serif SC","Noto Serif SC","Songti SC","SimSun",Georgia,serif;
+    --font-data:"JetBrains Mono","Cascadia Mono",Consolas,"SFMono-Regular",ui-monospace,monospace;
+    --col:46rem;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ground:#0D1315; --surface:#151D20; --surface-2:#1C2629;
+      --line:#263336; --line-strong:#35464A;
+      --ink:#E7EEEF; --ink-2:#BAC7C9; --muted:#869799;
+      --accent:#43B7C1; --accent-soft:#123034;
+      --fail:#E4906A; --fail-soft:#2E1C15;
+      --pass:#79C39B; --pass-soft:#15291F;
+      --warn:#D9B44A; --warn-soft:#2B2413;
+    }
+  }
+  :root[data-theme="dark"]{
+    --ground:#0D1315; --surface:#151D20; --surface-2:#1C2629;
+    --line:#263336; --line-strong:#35464A;
+    --ink:#E7EEEF; --ink-2:#BAC7C9; --muted:#869799;
+    --accent:#43B7C1; --accent-soft:#123034;
+    --fail:#E4906A; --fail-soft:#2E1C15;
+    --pass:#79C39B; --pass-soft:#15291F;
+    --warn:#D9B44A; --warn-soft:#2B2413;
+  }
+
+  *{box-sizing:border-box}
+  body{
+    background:var(--ground); color:var(--ink);
+    font-family:var(--font-body); font-size:16.5px; line-height:1.8;
+    -webkit-font-smoothing:antialiased;
+    margin:0; padding:0;
+  }
+  .wrap{ max-width:var(--col); margin:0 auto; padding:3.5rem 1.4rem 6rem; }
+  .wide{ max-width:var(--col); margin-inline:auto; }
+
+  /* ── masthead ── */
+  header.mast{ border-bottom:2px solid var(--ink); padding-bottom:1.4rem; margin-bottom:2.6rem; }
+  .eyebrow{
+    font-family:var(--font-data); font-size:.72rem; letter-spacing:.16em;
+    text-transform:uppercase; color:var(--accent); margin:0 0 .9rem;
+  }
+  h1{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(1.9rem,5vw,2.7rem); line-height:1.32;
+    letter-spacing:-.01em; text-wrap:balance; margin:0 0 .8rem;
+  }
+  .standfirst{ color:var(--ink-2); font-size:1.02rem; margin:0; max-width:38rem; }
+  .meta{
+    font-family:var(--font-data); font-size:.74rem; color:var(--muted);
+    margin-top:1.1rem; display:flex; flex-wrap:wrap; gap:.4rem 1.1rem;
+  }
+
+  /* ── sections ── */
+  section{ margin-top:3.6rem; }
+  h2{
+    font-family:var(--font-display); font-weight:700;
+    font-size:1.32rem; line-height:1.45; letter-spacing:-.005em;
+    margin:0 0 1.1rem; padding-top:1.4rem;
+    border-top:1px solid var(--line);
+    display:flex; gap:.7rem; align-items:baseline; text-wrap:balance;
+  }
+  h2 .num{
+    font-family:var(--font-data); font-size:.8rem; font-weight:500;
+    color:var(--accent); flex:none; letter-spacing:.02em;
+  }
+  h3{
+    font-family:var(--font-body); font-weight:700;
+    font-size:1rem; margin:2.1rem 0 .7rem; color:var(--ink);
+  }
+  p{ margin:0 0 1.05rem; }
+  strong{ font-weight:700; }
+  em{ font-style:normal; background:var(--accent-soft); padding:.08em .3em; border-radius:3px; }
+  code{
+    font-family:var(--font-data); font-size:.86em;
+    background:var(--surface-2); padding:.1em .35em; border-radius:3px;
+    border:1px solid var(--line);
+  }
+  a{ color:var(--accent); text-decoration-thickness:1px; text-underline-offset:2px; }
+  a:focus-visible{ outline:2px solid var(--accent); outline-offset:2px; border-radius:2px; }
+
+  /* ── tables ── */
+  .scroller{ overflow-x:auto; margin:1.3rem 0 1.6rem; }
+  table{
+    border-collapse:collapse; width:100%; min-width:32rem;
+    font-size:.9rem; font-variant-numeric:tabular-nums;
+  }
+  caption{
+    caption-side:top; text-align:left; font-size:.78rem; color:var(--muted);
+    font-family:var(--font-data); padding-bottom:.55rem; letter-spacing:.02em;
+  }
+  th,td{ padding:.5rem .7rem; text-align:right; border-bottom:1px solid var(--line); }
+  th:first-child,td:first-child{ text-align:left; }
+  thead th{
+    font-family:var(--font-data); font-size:.72rem; font-weight:500;
+    letter-spacing:.05em; color:var(--muted); text-transform:uppercase;
+    border-bottom:1px solid var(--line-strong); white-space:nowrap;
+  }
+  tbody tr:hover{ background:var(--surface-2); }
+  td.num,th.num{ font-family:var(--font-data); }
+  .dim{ color:var(--muted); }
+  .z{ color:var(--fail); font-weight:700; }
+  .ok{ color:var(--pass); font-weight:700; }
+  .hl{ background:var(--surface); font-weight:700; }
+  .rule-top td{ border-top:1px solid var(--line-strong); }
+
+  /* ── verdict list at top ── */
+  .verdicts{ display:flex; flex-direction:column; gap:0; margin:1.2rem 0 0; }
+  .v{
+    display:grid; grid-template-columns:1fr; gap:.15rem 1rem;
+    padding:.85rem 0; border-bottom:1px solid var(--line);
+  }
+  @media(min-width:34rem){ .v{ grid-template-columns:11.5rem 1fr; align-items:baseline; } }
+  .v .q{ font-size:.92rem; color:var(--ink-2); }
+  .v .a{ font-weight:700; }
+  .v .a .no{ color:var(--fail); }
+  .v .a .yes{ color:var(--pass); }
+
+  /* ── callouts: two kinds, deliberately different ── */
+  .fix, .rely{
+    margin:1.4rem 0; padding:.95rem 1.15rem; border-radius:2px;
+    font-size:.93rem; line-height:1.72;
+  }
+  .fix{
+    background:var(--fail-soft);
+    border-left:3px solid var(--fail);
+  }
+  .rely{
+    background:var(--warn-soft);
+    border-left:3px solid var(--warn);
+  }
+  .fix .tag, .rely .tag{
+    display:block; font-family:var(--font-data); font-size:.7rem;
+    letter-spacing:.13em; text-transform:uppercase; margin-bottom:.45rem;
+  }
+  .fix .tag{ color:var(--fail); }
+  .rely .tag{ color:var(--warn); }
+  .fix p:last-child, .rely p:last-child, .fix ul:last-child, .rely ul:last-child{ margin-bottom:0; }
+  .fix ul, .rely ul{ margin:.5rem 0 .5rem; padding-left:1.1rem; }
+  .fix li, .rely li{ margin-bottom:.4rem; }
+
+  /* ── option cards ── */
+  .opts{ display:grid; gap:.85rem; margin:1.4rem 0; }
+  .opt{
+    background:var(--surface); border:1px solid var(--line);
+    border-radius:3px; padding:1rem 1.15rem;
+  }
+  .opt h4{
+    font-family:var(--font-body); font-size:.95rem; margin:0 0 .5rem;
+    display:flex; gap:.55rem; align-items:baseline;
+  }
+  .opt h4 .k{
+    font-family:var(--font-data); font-size:.78rem; color:var(--accent);
+    border:1px solid var(--accent); border-radius:3px; padding:.02em .38em; flex:none;
+  }
+  .opt p{ margin:0 0 .55rem; font-size:.92rem; color:var(--ink-2); }
+  .opt p:last-child{ margin-bottom:0; }
+  .opt .cost{
+    font-size:.85rem; color:var(--fail); border-top:1px dashed var(--line-strong);
+    padding-top:.5rem; margin-top:.6rem;
+  }
+
+  ul.plain{ padding-left:1.15rem; margin:0 0 1.05rem; }
+  ul.plain li{ margin-bottom:.45rem; }
+
+  footer{
+    margin-top:4rem; padding-top:1.4rem; border-top:1px solid var(--line);
+    font-size:.82rem; color:var(--muted);
+  }
+  footer h3{ font-size:.8rem; color:var(--muted); font-family:var(--font-data);
+    letter-spacing:.08em; text-transform:uppercase; margin:1.5rem 0 .5rem; }
+  footer ul{ padding-left:1.05rem; margin:0 0 1rem; }
+  footer li{ margin-bottom:.35rem; }
+
+  @media (prefers-reduced-motion: reduce){ *{ animation:none!important; transition:none!important; } }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <p class="eyebrow">待裁 ㉓ · 分量取证</p>
+  <h1>四块大陆为什么不种地</h1>
+  <p class="standfirst">
+    对「4/5 的大陆永远停在游群」逐道门槛的独立分解。结论推翻了原先的归因：
+    <strong>瓶颈不是干旱</strong>，而是四种互不相同的病 —— 没有单一解药。
+  </p>
+  <div class="meta">
+    <span>蓝星 / Humen</span>
+    <span>2026-10-03</span>
+    <span>world.db · 197 部落</span>
+    <span>全部数字已复现</span>
+  </div>
+</header>
+
+<section id="s0">
+  <h2><span class="num">00</span><span>摘要：六问六答</span></h2>
+
+  <div class="verdicts">
+    <div class="v"><span class="q">是不是「太干」？</span><span class="a"><span class="no">不是。</span> C1/C2 最优部落的降水因子是 1.0000（639 / 663 mm）</span></div>
+    <div class="v"><span class="q">改霜冻项能救吗？</span><span class="a"><span class="no">只救回 7 个部落，全在 C1。</span> C2 一个都救不回</span></div>
+    <div class="v"><span class="q">为什么 C2 救不回？</span><span class="a">表土最大值 0.225 m，38 个部落<strong>没有一个</strong>过 0.25 m 门槛 —— <span class="no">霜冻对它根本不是瓶颈</span></span></div>
+    <div class="v"><span class="q">补灌溉能解 ㉓ 吗？</span><span class="a"><span class="no">不能。</span> 灌溉补的是水，而卡住 C1 的是霜冻、卡住 C2 的是土薄</span></div>
+    <div class="v"><span class="q">那灌溉该不该补？</span><span class="a"><span class="yes">该</span>，但理由与 ㉓ 无关 —— <code>design.md:815</code> 早已写好，<code>tech_tree.md</code> 里没有</span></div>
+    <div class="v"><span class="q">C4 / C5 呢？</span><span class="a"><span class="yes">极地，正确行为。</span> 但两块占 2/5 陆地，地球只有 1 块</span></div>
+  </div>
+
+  <p style="margin-top:1.6rem">
+    <strong>一句话</strong>：㉓ 不是一种病，是<strong>四种病</strong>。
+    而外部研究里那句「改霜冻项能恢复 111 个不可达节点」<strong>是严重高估</strong> ——
+    它看不到土壤门槛在独立挡人，因为<strong>这是我给它的上下文缺了逐项分解造成的，不是它算错</strong>。
+  </p>
+</section>
+
+<section id="s1">
+  <h2><span class="num">01</span><span>本地实测：瓶颈到底是什么</span></h2>
+
+  <p>
+    数据源 <code>world.db</code>，<strong>197 个存活部落</strong>（100 为创世数，含后世分裂）。
+  </p>
+
+  <h3>逐项分解</h3>
+  <p>
+    取每块大陆 <code>agriculture_factor</code> 最高的部落。
+    <code>AgricultureFactor = depth × frost × rain × soilBonus</code>
+  </p>
+
+  <div class="scroller">
+  <table>
+    <caption>各大陆最优部落的因子分解 · 判据 af &gt; 0.30</caption>
+    <thead>
+      <tr>
+        <th>大陆</th><th class="num">n</th><th class="num">af</th>
+        <th class="num">表土 m</th><th class="num">最冷月 ℃</th><th class="num">降水 mm</th>
+        <th class="num">depth</th><th class="num">frost</th><th class="num">rain</th>
+        <th>绑定项</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>C1</td><td class="num">39</td><td class="num">0.1358</td><td class="num">0.283</td><td class="num">−7.3</td><td class="num">639</td><td class="num">0.8086</td><td class="num z">0.1683</td><td class="num ok">1.0000</td><td>霜冻</td></tr>
+      <tr><td>C2</td><td class="num">38</td><td class="num">0.0150</td><td class="num">0.225</td><td class="num">−10.4</td><td class="num">663</td><td class="num">0.6429</td><td class="num z">0.0234</td><td class="num ok">1.0000</td><td>霜冻</td></tr>
+      <tr class="hl"><td>C3</td><td class="num">80</td><td class="num">0.8571</td><td class="num">0.300</td><td class="num">+12.8</td><td class="num">1274</td><td class="num">0.8571</td><td class="num ok">1.0000</td><td class="num ok">1.0000</td><td>表土</td></tr>
+      <tr><td>C4</td><td class="num">20</td><td class="num">0.0000</td><td class="num">0.000</td><td class="num">−67.2</td><td class="num">15</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td><td>极地</td></tr>
+      <tr><td>C5</td><td class="num">20</td><td class="num">0.0000</td><td class="num">0.000</td><td class="num">−69.8</td><td class="num">15</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td><td>极地</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="fix">
+    <span class="tag">更正 · 一</span>
+    <p>
+      <strong>C1 / C2 的降水因子是 1.0000 —— 它们不缺水。</strong>
+      这一条推翻了「四大洲都是太干」的旧说法。
+    </p>
+  </div>
+
+  <h3>逐道门槛独立统计</h3>
+  <p><code>topsoil &gt; 0.25</code> 与 <code>af &gt; 0.30</code> 必须同时成立。</p>
+
+  <div class="scroller">
+  <table>
+    <caption>每道门槛单独看，各自挡住多少人</caption>
+    <thead>
+      <tr>
+        <th>大陆</th><th class="num">部落</th><th class="num">表土合格</th>
+        <th class="num">霜冻 &gt; 0.30</th><th class="num">降水合格</th><th class="num">实际通过</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td>C1</td><td class="num">39</td><td class="num">7</td><td class="num z">0</td><td class="num">11</td><td class="num z">0</td></tr>
+      <tr><td>C2</td><td class="num">38</td><td class="num z">0</td><td class="num z">0</td><td class="num">8</td><td class="num z">0</td></tr>
+      <tr class="hl"><td>C3</td><td class="num">80</td><td class="num">80</td><td class="num">80</td><td class="num">80</td><td class="num ok">80</td></tr>
+      <tr><td>C4</td><td class="num">20</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td></tr>
+      <tr><td>C5</td><td class="num">20</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td><td class="num z">0</td></tr>
+      <tr class="rule-top"><td>合计</td><td class="num">197</td><td class="num">87</td><td class="num">80</td><td class="num">99</td><td class="num ok">80</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="fix">
+    <span class="tag">更正 · 二</span>
+    <p>
+      <strong>C2 的表土最大值是 0.225 m —— 38 个部落没有一个过 0.25 m 门槛。</strong>
+      所以 C2 卡在<strong>土</strong>上，<strong>与霜冻无关</strong>。
+      ㉓ 原文把 C2 与 C1 一同归入大陆度／干旱，<strong>不准确</strong>：
+      它的最优部落降水 663 mm、降水因子 1.0000，<strong>根本不缺水</strong>。
+    </p>
+  </div>
+
+  <h3>反事实：把霜冻项整个设成 1.0</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>如果霜冻这一道锁凭空消失，还剩几道锁</caption>
+    <thead><tr><th>大陆</th><th class="num">通过</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td>C1</td><td class="num ok">7</td><td>这 7 个本来是 表土合格 ∩ 降水合格，只被霜冻挡住</td></tr>
+      <tr><td>C2</td><td class="num z">0</td><td><strong>霜冻不是它的瓶颈</strong></td></tr>
+      <tr><td>C3</td><td class="num">80</td><td>本来就过</td></tr>
+      <tr><td>C4 / C5</td><td class="num z">0</td><td>极地，补什么都不动</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    再叠加「表土门槛降到 0.15 m」：C1 仍是 <strong>7</strong>，C2 只到 <strong>2</strong>。
+  </p>
+
+  <div class="fix">
+    <span class="tag">更正 · 三</span>
+    <p>
+      霜冻项<strong>确实是 C1 的瓶颈</strong>（10 个温带部落只差「冬天暖 3~4 ℃」），
+      但<strong>修好霜冻也只能救回 7 个部落</strong>。研究简报里那句
+      「改霜冻项能恢复那 111 个不可达节点」——<strong>高估了一个量级</strong>。
+      C2 卡在土，不在霜。
+    </p>
+  </div>
+
+  <h3>C1 内部是劈成两半的</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>C1 的 39 个部落，按纬度分成两种完全不同的病</caption>
+    <thead><tr><th>分组</th><th class="num">n</th><th class="num">均降水</th><th class="num">均表土</th><th class="num">最冷月</th></tr></thead>
+    <tbody>
+      <tr><td>纬度 &lt; 40°（沙漠那半）</td><td class="num">29</td><td class="num z">49.1 mm</td><td class="num z">0.0118 m</td><td class="num">−13.7 ~ −7.9 ℃</td></tr>
+      <tr><td>纬度 ≥ 40°（温带那半）</td><td class="num">10</td><td class="num ok">517.6 mm</td><td class="num">0.2295 m</td><td class="num">−11.5 ~ −7.3 ℃</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    沙漠那半是<strong>真旱</strong>（降水被大陆度项吃干净，<code>MinRainMm = 15</code> 钳位）；
+    温带那半<strong>不缺水</strong>，是霜冻。
+  </p>
+
+  <h3>最暖月实测</h3>
+  <p><code>mean_temp_c + season_amp_c</code>，与 <code>Climate.cs:357</code> 的定义一致。</p>
+
+  <div class="scroller">
+  <table>
+    <caption>夏天到底有多热 —— 这一栏决定了霜冻项是不是在制造假阴性</caption>
+    <thead><tr><th>大陆</th><th class="num">最暖月 max</th><th class="num">min</th><th class="num">≥ 10 ℃ 的部落</th></tr></thead>
+    <tbody>
+      <tr><td>C1</td><td class="num ok">28.1 ℃</td><td class="num">23.6 ℃</td><td class="num ok">39 / 39</td></tr>
+      <tr><td>C2</td><td class="num ok">26.3 ℃</td><td class="num">21.8 ℃</td><td class="num ok">38 / 38</td></tr>
+      <tr><td>C3</td><td class="num">27.0 ℃</td><td class="num">14.5 ℃</td><td class="num">80 / 80</td></tr>
+      <tr><td>C4</td><td class="num">15.5 ℃</td><td class="num">−0.5 ℃</td><td class="num">5 / 20</td></tr>
+      <tr><td>C5</td><td class="num z">6.6 ℃</td><td class="num">−2.7 ℃</td><td class="num z">0 / 20</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    <strong>C1 / C2 是夏热冬寒的大陆性气候</strong>（正是 Peace River、黑龙江、雅库茨克那个型），
+    <strong>不是寒带</strong>。C5 最暖月最高只有 6.6 ℃ —— 那才是真极地。
+  </p>
+
+  <h3>附带测得的三件事</h3>
+  <ul class="plain">
+    <li>
+      <strong>117 个卡住的部落，117 个都住在河边</strong>（<code>river_id</code> 与 <code>tributary_id</code> 全非空，C1/C2/C4/C5 无一例外）。
+      与真实文明摇篮（尼罗河 ~25 mm · 两河 ~200 mm · 印度河 ~250 mm，<strong>全是灌溉沙漠河</strong>）同形。
+    </li>
+    <li>
+      <code>planting</code> 是<strong>单点地理咽喉</strong>：176 个节点里 <strong>111 个（63%）</strong>传递依赖它，
+      而树里 28 个 <code>geo</code> 门槛中，要求 <code>可耕地</code> 的<strong>只有它一个</strong>。
+    </li>
+    <li>
+      <code>tech_tree.md</code> 里<strong>没有任何灌溉节点</strong>（中英文都搜过，<code>灌溉</code> / <code>irrigation</code> 均 0 命中），
+      而 <code>design.md:815</code> 早已写好：「历法 + 河流 ｜ 临河 ｜ 中 ｜ 人口容量↑↑ ｜ 尼罗河水的运作」。
+    </li>
+    <li>
+      2 个悬空 <code>pre</code> 引用（<code>上一级1</code>、<code>上一级2</code>）<strong>都在作者的占位样例 <code>my_new_thing</code> 上</strong>，不在真实节点上。
+    </li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2><span class="num">02</span><span>外部证据 A：真实世界的农业门槛</span></h2>
+
+  <p><strong>核心结论：−12 ℃ 是冬小麦的越冬线，不是农业的界限。</strong></p>
+
+  <div class="scroller">
+  <table>
+    <caption>对抗性验证（每条 3 票，≥2 票反驳即否决）</caption>
+    <thead><tr><th>主张</th><th>裁定</th></tr></thead>
+    <tbody>
+      <tr><td>春播作物（大麦/燕麦/黍/马铃薯）<strong>没有越冬需求</strong>，霜冻限制只在生长季内且温和得多：大麦孕穗约 −2 ℃、抽穗开花约 −1 ℃（2 小时暴露）</td><td class="ok">CONFIRMED</td></tr>
+      <tr><td>−12 ℃ 最冷月门槛<strong>只是冬小麦的北界</strong>。中国冬麦区研究给的最冷月区间 −12 ~ +15 ℃；传统北界 −8 ℃</td><td class="ok">CONFIRMED</td></tr>
+      <tr><td>越冬的机制性正确变量是<strong>冠层深度（3–5 cm）土壤温度</strong>。锻炼充分的冬小麦可耐约 −20 ℃，不足的约 −16 ℃ 就死</td><td class="ok">CONFIRMED</td></tr>
+      <tr><td>积雪把土温与气温解耦，故最冷月<strong>气温</strong>是越冬存活的劣质代理</td><td class="z">机制对，单位错 → REFUTED</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>真实世界的对照点</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>地球上真的在雨养种谷物的最冷的地方</caption>
+    <thead><tr><th>地点</th><th class="num">一月均温</th><th>雨养谷物？</th></tr></thead>
+    <tbody>
+      <tr><td>Yakutsk，西伯利亚（62°N）</td><td class="num">≈ −36 ~ −38 ℃</td><td class="ok">✅ 春麦、大麦、马铃薯</td></tr>
+      <tr><td>黑龙江，中国</td><td class="num">−15 ~ −30 ℃</td><td class="ok">✅ 春麦、马铃薯</td></tr>
+      <tr><td>Ulaanbaatar，蒙古</td><td class="num">≈ −22 ℃</td><td class="ok">✅ 2011 年小麦自给 105.6 %</td></tr>
+      <tr><td>Peace River，加拿大</td><td class="num">≈ −14 ℃</td><td class="ok">✅</td></tr>
+      <tr><td>Inari，芬兰 Arctic Lapland</td><td class="num">≈ −12 ℃</td><td class="ok">✅ 大麦、燕麦</td></tr>
+      <tr class="rule-top"><td><strong>模拟器 C2</strong></td><td class="num">−10.4 ℃</td><td class="z">❌ 卡死</td></tr>
+      <tr><td><strong>模拟器 C1</strong></td><td class="num">−7.3 ℃</td><td class="z">❌ 卡死</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    <strong>这两块大陆的冬季比地球上任何一个有据可查的雨养春麦区都暖</strong> ——
+    门槛在制造<strong>假阴性</strong>。
+  </p>
+
+  <h3>该换什么变量：生长季热量</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>不像「最冷月气温」那样有单一阈值，而是热量累积</caption>
+    <thead><tr><th>判据</th><th class="num">数值</th><th>来源</th></tr></thead>
+    <tbody>
+      <tr><td>春大麦需热量</td><td class="num">700–900 GDD (base 5 ℃)</td><td>ACIA 北极气候影响评估</td></tr>
+      <tr><td>冰岛可行谷物</td><td class="num">938–954 dd (base 1 ℃)</td><td>2022 <em>Climatic Change</em></td></tr>
+      <tr><td>Vestvågøy 试种大麦成熟</td><td class="num">仅 761 dd (base 5 ℃)</td><td>挪威试种</td></tr>
+      <tr><td>谷物成熟无霜期</td><td class="num">≈ 100 天</td><td>多源（快熟品种 ~90 天）</td></tr>
+      <tr><td>马铃薯</td><td class="num">≈ 90 无霜日</td><td>叶部 ~−2 ℃ 冻死，可种到 ~68°N</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <ul>
+      <li><strong>各来源的 base 温度不同（0 / 1 / 5 ℃），数字不可直接互比</strong> —— 用之前先定 base。</li>
+      <li>高纬度还有<strong>光周期补偿</strong>：日照越长，所需热量越少（拉普兰大麦六周即可成熟）。</li>
+    </ul>
+  </div>
+
+  <h3>世界生成：极地大陆超产</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>地球只有一块冰盖大陆，因为北极是洋不是陆</caption>
+    <thead><tr><th>指标</th><th class="num">地球</th><th class="num">本模拟器</th><th class="num">倍数</th></tr></thead>
+    <tbody>
+      <tr><td>极地冰盖大陆</td><td class="num">1 块</td><td class="num z">2 / 5</td><td class="num dim">—</td></tr>
+      <tr><td>永久冰盖占陆地</td><td class="num">≈ 10.5 %</td><td class="num z">40 %</td><td class="num z">≈ 3.8×</td></tr>
+      <tr><td>极地纬度陆地占比</td><td class="num">≈ 20.7 %</td><td class="num">40 %</td><td class="num">≈ 2×</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    地球陆地 148.9 M km² = 29.2 %；<strong>北半球占 67 %</strong>，重心在<strong>中纬度</strong>
+    （30–60°N 带 46.67 M km²，40–50°N 峰值 16.50 M km²）——
+    <strong>正是这个中纬度偏置让地球这么好种</strong>。程序生成的五大陆若不带纬度偏置，很容易落两块到极区。
+  </p>
+</section>
+
+<section id="s3">
+  <h2><span class="num">03</span><span>外部证据 B：灌溉该怎么建模</span></h2>
+
+  <p><strong>已有一切模型里，没有一个把农业锁在灌溉上。</strong></p>
+
+  <div class="scroller">
+  <table>
+    <caption>灌溉在各自系统里的表示方式</caption>
+    <thead><tr><th>模型</th><th>灌溉怎么表示</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Seshat</strong><br><span class="dim">Turchin et al. 2021</span></td><td><strong>连续系数</strong>：相对产量系数 RYC 把灌溉作为产量提升项引入 —— 小麦 <strong>+48 %</strong>。不是开关</td></tr>
+      <tr><td><strong>Seshat 数据库</strong></td><td><strong>二元存在标志</strong>（Present / Absent / Unknown），且是政体共有的集体资产，带证据等级标签。<strong>不含规模、面积、造价</strong></td></tr>
+      <tr><td><strong>Civilization VI</strong></td><td>农场<strong>早于</strong>灌溉科技就能建 —— 灌溉是增强节点，<strong>不是农业的解锁</strong></td></tr>
+      <tr><td><strong>Dwarf Fortress</strong></td><td>灌溉<strong>只用于把石/岩地面变成可耕</strong>；天然土壤连沙地都不用灌溉。且灌溉<strong>不能</strong>在恶劣群系种出地表植物 —— 那是气候管的</td></tr>
+      <tr><td><strong>Crusader Kings 3</strong></td><td>农场建筑走<strong>创新链</strong>（Crop Rotation / Manorialism / Guilds / Cranes），是科技门，不是灌溉门</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <ul>
+      <li>CK3「地形硬门」那条<strong>被驳回</strong>（1-2），不要当作已证事实引用。</li>
+      <li>Civ IV/V「淡水是农场硬性科技门」标注 CONFIRMED <strong>但证据文本自称未在会话内核实</strong> —— 内部矛盾，按低置信度处理。</li>
+    </ul>
+  </div>
+
+  <p>
+    <strong>共同的形状</strong>：灌溉在已有一切模型里，要么是<strong>连续产量系数</strong>，
+    要么是<strong>受门的集体资产</strong> —— 从来没有一个是「免费的永久开关」，
+    也没有一个是「农业的解锁」。
+  </p>
+
+  <h3>真实历史：灌溉出现在雨养农业边缘的地方</h3>
+
+  <p>
+    机制是<strong>确定性质量平衡，不是随机事件</strong>：
+    中下游美索不达米亚<strong>潜在蒸散 &gt; 2000 mm</strong>；灌溉抬高地下水位越过临界深度 →
+    毛细上升 + 地表蒸发 → 析出盐膜 → 下次灌溉再溶解 → <strong>土壤盐分逐步上升</strong>。
+    今天下美索不达米亚 <strong>~70 % 的土壤不同程度盐渍化</strong>。
+  </p>
+
+  <div class="scroller">
+  <table>
+    <caption>代价是内在的、长期的 —— 第一次被记录在近东</caption>
+    <thead><tr><th>证据</th><th>数值</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Girsu</strong> 的 <code>Ugig</code> 纳税地块大麦产量</td><td><strong>2500 → 1400 l/ha（≈ −44 %）</strong>，历时约 <strong>300 年</strong></td></tr>
+      <tr><td>乌尔第三王朝（前 2100 后）衰亡</td><td><strong>主要归因于盐渍化</strong>（另有社会组织不足、堤坝溃决、中央权力衰败、淤积等竞争解释）</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p><strong>时间尺度是几百年，不是几十年，且逐区复现</strong>：</p>
+
+  <div class="scroller">
+  <table>
+    <caption>同一个病，在不同区域晚了千年才发作</caption>
+    <thead><tr><th>区域</th><th class="num">盐渍化时间</th></tr></thead>
+    <tbody>
+      <tr><td>伊拉克南部</td><td class="num">前 2400 – 至少前 1700</td></tr>
+      <tr><td>伊拉克中部</td><td class="num">前 1200 – 前 900</td></tr>
+      <tr><td>巴格达以东 Nahrwan</td><td class="num">公元 1200 之后</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>
+      Powell (1985) 等质疑盐渍化是衰亡的<strong>主因</strong>（河流改道、政治因素也在内）——
+      <strong>盐渍化是真实长期代价，但不是唯一驱动</strong>，不要抹平。
+    </p>
+  </div>
+
+  <h3>可落地参数</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>能用的量级，以及各自的水分</caption>
+    <thead><tr><th>参数</th><th class="num">数值</th><th>出处 / 注意</th></tr></thead>
+    <tbody>
+      <tr>
+        <td>灌溉产量倍率</td><td class="num">+48 %</td>
+        <td>Seshat Table 1。<strong>溯源偏弱</strong>：底层 Chapagain &amp; Good 2015 是阿尔伯塔<strong>雨养</strong>产量差研究，不是灌溉试验 —— 当建模锚点，不是硬常数</td>
+      </tr>
+      <tr>
+        <td>未衬砌土渠输水损失</td><td class="num">3–8 l/s / 100 m</td>
+        <td>IRC/WHO TB-41 (1994)，渠道过流 20–60 l/s。<strong>该来源自己的算例用的是 2 l/s/100 m</strong>，内部不一致</td>
+      </tr>
+      <tr>
+        <td>单位峰值灌溉面积设计流量</td><td class="num">≈ 4.4 l/s / ha</td>
+        <td>同上：10 ha → 44 l/s = 28（田间）+ 16（渗漏），<strong>≈ 36 % 是输水损失</strong>。依赖该例的高峰值 ETo 与 40 % 田间损失率</td>
+      </tr>
+      <tr>
+        <td>长期盐渍化产量惩罚</td><td class="num z">≈ −44 %</td>
+        <td>Girsu，历时 ≈ 300 年。<strong>没有逐年速率、没有水盐浓度乘子、没有排水质量项</strong> —— 这是最大的参数空洞</td>
+      </tr>
+    </tbody>
+  </table>
+  </div>
+
+  <p>
+    <strong>关键结论</strong>：灌溉是<strong>经常性的输水／维护开销</strong>（约 36 % 损耗），
+    不是一次性建设成本；且带一个<strong>以世纪计的累积盐渍惩罚</strong>。
+  </p>
+
+  <div class="fix">
+    <span class="tag">更正 · 四 · 整片无支撑</span>
+    <p>
+      研究问题里的「美索不达米亚、尼罗河、印度河、黄河各自的<strong>降水／流量门槛与发生年代</strong>」——
+      <strong>所有候选主张全部被驳回（0-3）</strong>：
+    </p>
+    <ul>
+      <li>❌「近东最早灌溉农业出现在尼罗河，约前 5000；前 3000 传到两河」</li>
+      <li>❌「灌溉恰好兴起于无雨区，雨养无法维持耕作之处」</li>
+      <li>❌「是<strong>洪水可预测性</strong>而非降水决定了是否需要灌溉」</li>
+      <li>❌「全球约 25–30 % 灌溉地盐渍化且基本无商业产出」</li>
+    </ul>
+    <p>
+      <strong>印度河与黄河没有任何存活的主张。</strong>
+      所以本报告<strong>能给出机制与参数，不能给出四条河各自的已验证门槛或年代</strong>。
+      这一片是<strong>真正的空白</strong>，不是「没找到」，是「找到了但都站不住」。
+    </p>
+  </div>
+</section>
+
+<section id="s4">
+  <h2><span class="num">04</span><span>两份研究的可靠性</span></h2>
+
+  <p>
+    研究是<strong>对抗性验证</strong>做的（每条主张 3 票，≥2 票反驳即否决），但<strong>有硬缺陷</strong>。
+    以下全部原样保留，不抹平。
+  </p>
+
+  <div class="scroller">
+  <table>
+    <caption>裁定分布</caption>
+    <thead><tr><th>研究</th><th class="num">CONFIRMED</th><th class="num">REFUTED</th><th class="num">UNSUPPORTED</th><th class="num">NO-VERDICT</th></tr></thead>
+    <tbody>
+      <tr><td>霜冻项</td><td class="num ok">46</td><td class="num z">4</td><td class="num">28</td><td class="num">6</td></tr>
+      <tr><td>灌溉</td><td class="num ok">17</td><td class="num z">8</td><td class="num dim">—</td><td class="num">0</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <h3>缺陷一：验证环节联网被挡</h3>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>
+      验证者自己的 note 写着 <em>“the environment blocks WebFetch and WebSearch”</em>、
+      <em>“Cited PDFs not retrievable here”</em>。所以那些 CONFIRMED 是
+      <strong>「与验证者自身知识一致」，不是「独立核对过来源」</strong>。
+      方向稳健（多源独立趋同），但<strong>不是逐条溯源过的</strong>。
+    </p>
+  </div>
+
+  <h3>缺陷二：我的 join 写错了</h3>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>
+      我按 claim 字符串<strong>精确匹配</strong>合并裁定，而验证者会<strong>改写措辞</strong>，
+      于是裁定全丢，<strong>合成器拿到的输入里所有条目都显示 UNVERIFIED</strong> —— 它因此<strong>过度保守</strong>。
+      已用相似度重新 join 修正（84 条里匹配上 78 条）。
+      <strong>真实裁定比合成器以为的强。</strong>
+    </p>
+  </div>
+
+  <h3>缺陷三：它给你的「预期效果」是错的</h3>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>霜冻研究原文写：</p>
+    <p style="padding-left:.9rem; border-left:2px solid var(--line-strong); color:var(--ink-2)">
+      “the −7.3°C and −10.4°C continents (rain = 1.0) should clear the gate on growing-season warmth,
+      restoring the ~111 currently-unreachable tech nodes.”
+    </p>
+    <p>
+      <strong>实测：只救回 7 个部落（全在 C1），C2 一个都不动。</strong>
+      原因见 §01 —— <strong>它看不到土壤门槛在独立挡人</strong>，因为我的输入只给了
+      <code>AgricultureFactor</code>，<strong>没给逐项分解</strong>。
+      <strong>这是我的问题，不是它的。</strong>
+    </p>
+  </div>
+
+  <h3>缺陷四：灌溉研究的根因诊断也是错的，错因同样在我</h3>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>
+      它的合成结论写 <em>“The root physical defect in the simulator is the unbounded continentality term”</em>，
+      建议给大陆度项加下界。
+      <strong>实测：C1/C2 最优部落的降水因子已经是 1.0000 —— 给大陆度加下界对它们毫无作用。</strong>
+      大陆度项只在 C4/C5（极地）饱和。
+      我喂给它的上下文说「4/5 大陆最大农业因子 0.14 / 0.02 / 0.00 / 0.00」，
+      <strong>没告诉它 C1/C2 的降水因子是 1.0</strong> —— 它据此推断「旱」是合理推理，前提是我给错了。
+    </p>
+  </div>
+
+  <h3>已被驳回并纠正的具体错误</h3>
+  <ul class="plain">
+    <li>「3–7 cm 雪 = 3–4 英寸」<strong>单位自相矛盾</strong>（3–4 英寸实为 7.6–10.2 cm）</li>
+    <li>「格陵兰冰盖 2.17 M km²」应为 <strong>~1.7 M</strong>（2.17 M 是格陵兰<strong>总</strong>面积）</li>
+    <li>「黍比粟更耐寒」<strong>被它自己引用的来源反驳</strong>（粟 <em>Setaria italica</em> 更适应高海拔／冷）</li>
+    <li>Ertebølle「无资源崩溃」<strong>引文反了</strong> —— 它引的 Rowley-Conwy 1984 恰恰<strong>主张</strong>牡蛎枯竭说</li>
+    <li>Ulaanbaatar 一月均温：正文写 −26 ℃，更正说明要求市区用 <strong>−22 ℃</strong> —— 同一份文件内部不一致</li>
+    <li>Peace River 在同一份文件里有 −14 ℃ 与 −17 ℃ 两个值，<strong>未统一</strong></li>
+  </ul>
+
+  <p><strong>两处文献本身仍无定论，不要抹平</strong>：</p>
+  <ul class="plain">
+    <li>冷缘限制是<strong>气候还是土壤</strong>（灰化土说）</li>
+    <li>北方农业前沿停滞是<strong>环境不可能还是社会「可得性模型」</strong>
+      （Zvelebil &amp; Rowley-Conwy：采集者<strong>知道</strong>农业而<strong>选择不采用</strong>约一千年）</li>
+  </ul>
+</section>
+
+<section id="s5">
+  <h2><span class="num">05</span><span>建议：四种病，五个选项</span></h2>
+
+  <h3>㉓ 是四种病，没有单一解药</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>每块大陆的病，以及补灌溉有没有用</caption>
+    <thead><tr><th>大陆</th><th>病</th><th>归属</th><th>补灌溉？</th></tr></thead>
+    <tbody>
+      <tr><td>C1 · 北半（29 个）</td><td>沙漠化 —— 降水 49 mm、表土 0.0118 m</td><td>土壤形成 + 大陆度</td><td>部分（补了水，还差土）</td></tr>
+      <tr><td>C1 · 温带（10 个）</td><td>霜冻 —— 不缺水（518 mm），只差「冬天暖 3~4 ℃」</td><td class="z">霜冻项误设</td><td class="z">❌ 无关</td></tr>
+      <tr><td>C2（38 个）</td><td><strong>表土太薄（max 0.225 m，0/38 合格）</strong></td><td class="z">土壤形成模型</td><td class="z">❌ 无关</td></tr>
+      <tr><td>C4 / C5（40 个）</td><td>极地（−67 / −70 ℃，最暖月 ≤ 6.6 ℃）</td><td>世界生成</td><td class="z">❌ 无关（且<strong>不该</strong>解开）</td></tr>
+      <tr><td>全部</td><td><code>tech_tree.md</code> 缺灌溉节点</td><td>真实缺口</td><td>—</td></tr>
+    </tbody>
+  </table>
+  </div>
+
+  <div class="rely">
+    <span class="tag">可靠性</span>
+    <p>
+      <strong>选择性是好的</strong>：任何改法都<strong>不应</strong>解开 C4/C5 —— 它们被霜冻／永冻归零，
+      补灌溉动不了它们，<strong>INV-15（寒带大陆不得解锁任何农业变体）自动保住</strong>。
+    </p>
+  </div>
+
+  <h3>五个选项（可分别裁定）</h3>
+
+  <div class="opts">
+    <div class="opt">
+      <h4><span class="k">a</span><span>补灌溉节点</span></h4>
+      <p>
+        <strong>仍该补，但它不是 ㉓ 的解药</strong>（补水、不补霜、不补土）。
+        它的真实分量在另一处：<strong>117 个卡住的部落全部同时持有 <code>river_id</code> 与 <code>tributary_id</code></strong> ——
+        缺的是 <code>design.md:815</code> 已承诺、而 <code>tech_tree.md</code> 里<strong>一个节点都没有</strong>的那件东西。
+      </p>
+    </div>
+
+    <div class="opt">
+      <h4><span class="k">b</span><span>冲积表土加分</span></h4>
+      <p>
+        <strong>这一条才是本次量出来的大头</strong> —— C2 表土 max 0.225 m（<strong>0/38 合格</strong>）、
+        C1 沙漠半部仅 0.0118 m，<strong>只放开水这一项仍然过不去</strong>。
+        这是「补灌溉」比「改一行门槛」大的地方。
+      </p>
+    </div>
+
+    <div class="opt">
+      <h4><span class="k">c</span><span>承认这四块大陆就是不该有农业</span></h4>
+      <p>
+        等价于接受 3D 视图上「活生生的世界」<strong>永久只剩 1/5 土地</strong>，
+        并连带改 §6.1 的 C1/C2「最优」标注与「五大文明摇篮」。
+      </p>
+    </div>
+
+    <div class="opt">
+      <h4><span class="k">d</span><span>换霜冻项的自变量</span></h4>
+      <p>
+        从「最冷月气温」改为<strong>生长季热量</strong>：
+      </p>
+      <p style="font-family:var(--font-data); font-size:.85rem">
+        现在 &nbsp;frost = smooth01(coldestMonthC, −12, +6)<br>
+        建议 &nbsp;warmth = smoothstep(80 → 130 无霜日) &nbsp;或&nbsp; smoothstep(600 → 1100 GDD base 5 ℃)
+      </p>
+      <p class="cost">
+        ⚠️ <strong>代价必须同时接受：只救回 7 个部落（全在 C1），不是 111 个节点。</strong>
+      </p>
+    </div>
+
+    <div class="opt">
+      <h4><span class="k">e</span><span>约束世界生成</span></h4>
+      <p>
+        极地冰盖大陆封顶 <strong>~1/5</strong>。地球<strong>只有 1 块</strong>冰盖大陆（因为北极是<strong>洋</strong>不是陆）；
+        本模拟器 2/5 = 40 % vs 地球 ≈ 10.5 %，约 <strong>3.8×</strong>。
+        另建议加一道 PCG 健全性检查（仿 StarCraft）：<strong>重掷</strong>「过多陆地永远过不了农业门槛」的世界。
+      </p>
+    </div>
+  </div>
+
+  <h3>若补灌溉，按已有一切模型的共同形状</h3>
+
+  <div class="scroller">
+  <table>
+    <caption>受门的集体资产 + 连续产量系数 + 累积代价</caption>
+    <thead><tr><th>项</th><th>建议值</th><th>依据</th></tr></thead>
+    <tbody>
+      <tr><td>前置</td><td>临河（<code>river_id</code> / <code>tributary_id</code>）+ 历法节点 + 劳动／社会组织</td><td>Seshat 的「政体共有」框架</td></tr>
+      <tr><td>产量倍率</td><td class="num">+48 %</td><td>Seshat Table 1（建模锚点，非硬常数）</td></tr>
+      <tr><td>经常性开销</td><td class="num">≈ 36 % 输水损失</td><td>IRC/WHO TB-41 (1994)</td></tr>
+      <tr><td>长期代价</td><td class="num z">盐渍化累积，上限 ≈ −44 %</td><td>Girsu（2500→1400 l/ha / ~300 年）</td></tr>
+      <tr><td class="z">缺的参数</td><td colspan="2" class="z">逐年盐渍速率、水盐浓度乘子、排水质量项、建设成本、维护劳力 —— <strong>全部无存活证据</strong>，需自定并<strong>标注为自定</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+</section>
+
+<section id="s6">
+  <h2><span class="num">06</span><span>没有做的事</span></h2>
+
+  <ul class="plain">
+    <li>
+      <strong>没有改任何模拟参数。</strong>
+      <code>Climate.cs</code> / <code>Soil.cs</code> / <code>EvolutionEngine.cs</code> / <code>tech_tree.md</code> 一行未动。
+    </li>
+    <li>
+      <strong>没有替作者做设计决定。</strong> 上面五个选项是<strong>并列</strong>的，不是推荐排序 ——
+      尤其 (c) 与「承认不该有农业」是等价的取舍。
+    </li>
+    <li>
+      <strong>没有把外部研究的结论当作已证实事实。</strong> §04 的所有缺陷都原样保留。
+    </li>
+    <li>
+      <strong>没有补那 111 个节点的可达性结论。</strong> 实测只说「改霜冻只救 7 个部落」，
+      至于<strong>这 7 个部落过门槛后能解锁多少节点，没有测</strong>。
+    </li>
+  </ul>
+
+  <h3>复现</h3>
+  <p style="font-family:var(--font-data); font-size:.82rem; line-height:1.75; background:var(--surface); border:1px solid var(--line); border-radius:3px; padding:1rem; overflow-x:auto; white-space:pre">import sqlite3
+c = sqlite3.connect('world.db')
+rows = c.execute("""select continent_id, topsoil_m, agriculture_factor,
+  annual_rain_mm, coldest_month_c, mean_temp_c, season_amp_c, soil_type
+  from tribes""").fetchall()
+
+def sm01(x, a, b):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+def parts(top, rain, cold):
+    d = max(0.0, min(1.0, top / 0.35))
+    f = sm01(cold, -12.0, 6.0)
+    r = sm01(rain, 150.0, 450.0) * (1 - 0.35 * sm01(rain, 2200.0, 3600.0))
+    return d, f, r          # 反事实：把 f 换成 1.0 重算</p>
+</section>
+
+<footer>
+  <p>
+    本页对应的仓内文档为 <code>research-farming-gate.md</code>；
+    裁定登记在 <code>design.md</code> §13.4 的 ㉓ 条目下（v0.25 补记）。
+  </p>
+
+  <h3>学术模型</h3>
+  <ul>
+    <li>Turchin et al. 2021, <em>The Holocene</em> 31(6):1055-1065, DOI 10.1177/0959683621994644（Seshat RYC，Table 1 灌溉系数）</li>
+    <li>Seshat 数据库灌溉词条（codebook 与证据等级）</li>
+  </ul>
+
+  <h3>土壤盐渍化与失败模式</h3>
+  <ul>
+    <li>Job (IRD, 1992)，美索不达米亚盐渍化（法文，溯 Jacobsen 1982）</li>
+    <li>Shahid, Zaman &amp; Heng (Springer/IAEA, 2018)，盐渍化分期（溯 Jacobsen &amp; Adams 1958）</li>
+  </ul>
+
+  <h3>水力参数</h3>
+  <ul>
+    <li>IRC/WHO Technical Brief No. 41, <em>Waterlines</em> 13(2), 1994（渠道损失、4.4 l/s/ha 算例）</li>
+  </ul>
+
+  <h3>被驳回的历史门槛来源</h3>
+  <ul>
+    <li>Angelakis et al., <em>Water</em> 12(5):1285, 2020 —— 4 条主张全部 0-3 驳回</li>
+    <li>river_civilizations 讲义 —— 洪水可预测性主张 0-3 驳回</li>
+  </ul>
+</footer>
+
+</div>
