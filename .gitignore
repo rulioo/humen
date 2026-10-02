@@ -1,0 +1,91 @@
+# ─────────────────────────────────────────────────────────────
+#  蓝星 Humen · 忽略规则
+#
+#  原则：**只跟踪「写出来的东西」，不跟踪「跑出来的东西」。**
+#  这个仓库要能被 clone 下来直接读懂设计、直接编译、直接用 Unity 打开，
+#  但不该背上几 GB 的中间产物。
+# ─────────────────────────────────────────────────────────────
+
+# ── .NET ────────────────────────────────────────────────────
+bin/
+obj/
+*.user
+*.suo
+.vs/
+
+# ── Unity ───────────────────────────────────────────────────
+# ⚠️ unity/Library 实测 **1.5 GB**，是全局最大的单项，且 Unity 会自己重建。
+#    第一次 clone 后打开工程，Unity 会重新导入（几分钟），这是正常的。
+unity/Library/
+unity/Temp/
+unity/Obj/
+unity/Build/
+unity/Builds/
+unity/Logs/
+unity/UserSettings/
+unity/MemoryCaptures/
+unity/Recordings/
+*.csproj
+*.sln
+!src/**/*.csproj
+!src/**/*.sln
+
+# ── 数据库（跑 `humen evolve` 就能重生成）────────────────────
+# ⚠️ world.db 是待裁 ㉓ 的证据来源 —— 它不在仓库里，
+#    所以要复现那批读数，得用同一个 seed 重跑一次。
+*.db
+*.db-shm
+*.db-wal
+*.db.bak-*
+*.db-journal
+*.summary.json
+
+# ── 出图与日志 ──────────────────────────────────────────────
+renders/
+src/renders/
+src/renders_hi/
+src/renders_test/
+logs/
+*.log
+unity-capture/
+
+# unity/ 根目录下的取证图（unity_continent_*.png 等）。
+# ⚠️ 只匹配根目录 —— `unity/Assets/Resources/Planet/*.png` 是**贴图**，
+#    是工程能不能跑起来的一部分，**必须跟踪**，别写成 `**/*.png` 把它们一起干掉。
+#    这些渲染产物用 unity/README.md 里的 `humen planet` 一行命令就能重出。
+/unity/*.png
+
+# 根目录的取证图：编辑器离屏出图与播放器截屏
+# （`humen planet` / `-humen-capture`，见 unity/README.md）。
+# 同属「跑出来的东西」，同上。
+/player-hud*.png
+/player-shot*.png
+/crop_markers.png
+/pick-test.png
+
+# ── 待清理：疑似重定向事故的残留 ────────────────────────────
+# `file`（12 字节，内容 "  - exists"）与 `continues`（14 字节，内容 "  - normally"）
+# —— 是本项目根目录下两个**没有扩展名、内容只是一个列表项碎片**的文件，
+#     典型是某次 `... > file` 把本该打印的一行写进了文件。
+#     **不是设计内容**，但也**不是我这轮建的**，所以只从版本控制里排除、
+#     没动磁盘上的原件。确认无用后可直接删：
+#         del E:\cc\humen\file E:\cc\humen\continues
+/file
+/continues
+
+# ── 本地备份与快照 ──────────────────────────────────────────
+# 这些是「保存进度」留下的还原点，属于本机状态，不是项目内容。
+*.bak
+*.bak-*
+*.orig
+snapshot-*/
+
+# ── Python ──────────────────────────────────────────────────
+__pycache__/
+*.pyc
+
+# ── 编辑器 / 系统 ───────────────────────────────────────────
+.vscode/
+.idea/
+Thumbs.db
+desktop.ini

@@ -1,0 +1,698 @@
+<title>蓝星可视化方案</title>
+<style>
+  /* ── tokens: light is the bare :root, dark redefines them ───────── */
+  :root {
+    --ground:   #F6F8FA;
+    --surface:  #FFFFFF;
+    --sunken:   #EDF1F5;
+    --ink:      #0F151C;
+    --muted:    #596675;
+    --faint:    #8B97A5;
+    --line:     #DCE3EA;
+    --line-soft:#E9EEF3;
+    --accent:   #1B6E8C;
+    --accent-s: #E3F0F5;
+    --ok:       #2E7D5B;
+    --ok-s:     #E2F1EA;
+    --warn:     #A8641A;
+    --warn-s:   #F7EEDF;
+    --shadow:   0 1px 2px rgba(15,21,28,.05), 0 4px 12px rgba(15,21,28,.04);
+
+    --sans: "Source Han Sans SC", "Noto Sans SC", "PingFang SC", "Microsoft YaHei", "Hiragino Sans GB", sans-serif;
+    --mono: ui-monospace, "Cascadia Mono", "SF Mono", "JetBrains Mono", Consolas, "Liberation Mono", monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground:   #0A0F16;
+      --surface:  #121A23;
+      --sunken:   #0E161E;
+      --ink:      #E3E9F0;
+      --muted:    #93A1B0;
+      --faint:    #6B7887;
+      --line:     #222E3B;
+      --line-soft:#1A2531;
+      --accent:   #4FB3D4;
+      --accent-s: #102A35;
+      --ok:       #4FBF8F;
+      --ok-s:     #0F2A21;
+      --warn:     #D89A4A;
+      --warn-s:   #2C2214;
+      --shadow:   0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground:   #0A0F16;
+    --surface:  #121A23;
+    --sunken:   #0E161E;
+    --ink:      #E3E9F0;
+    --muted:    #93A1B0;
+    --faint:    #6B7887;
+    --line:     #222E3B;
+    --line-soft:#1A2531;
+    --accent:   #4FB3D4;
+    --accent-s: #102A35;
+    --ok:       #4FBF8F;
+    --ok-s:     #0F2A21;
+    --warn:     #D89A4A;
+    --warn-s:   #2C2214;
+    --shadow:   0 1px 2px rgba(0,0,0,.3), 0 4px 14px rgba(0,0,0,.25);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 16px;
+    line-height: 1.75;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .wrap { max-width: 1080px; margin: 0 auto; padding: 0 24px 96px; }
+  .prose { max-width: 68ch; }
+
+  /* ── masthead ──────────────────────────────────────────────────── */
+  header.mast {
+    border-bottom: 1px solid var(--line);
+    padding: 64px 0 36px;
+    margin-bottom: 48px;
+  }
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 11.5px;
+    letter-spacing: .16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: flex;
+    gap: 14px;
+    flex-wrap: wrap;
+    align-items: baseline;
+    margin-bottom: 22px;
+  }
+  .eyebrow span { color: var(--faint); }
+  h1 {
+    font-size: clamp(30px, 5vw, 46px);
+    line-height: 1.16;
+    letter-spacing: -.02em;
+    font-weight: 800;
+    margin: 0 0 18px;
+    text-wrap: balance;
+  }
+  .standfirst {
+    font-size: 17.5px;
+    color: var(--muted);
+    max-width: 62ch;
+    margin: 0;
+    line-height: 1.7;
+  }
+  .standfirst b { color: var(--ink); font-weight: 600; }
+
+  /* ── section scaffolding ───────────────────────────────────────── */
+  section { margin: 0 0 60px; }
+  h2 {
+    font-size: 13px;
+    font-family: var(--mono);
+    letter-spacing: .14em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 600;
+    margin: 0 0 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  h3 {
+    font-size: 19px;
+    font-weight: 700;
+    letter-spacing: -.01em;
+    margin: 34px 0 10px;
+    text-wrap: balance;
+  }
+  p { margin: 0 0 16px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* ── verdict ───────────────────────────────────────────────────── */
+  .verdict {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    border-radius: 3px;
+    padding: 30px 32px;
+    box-shadow: var(--shadow);
+  }
+  .verdict h2 { border: none; padding: 0; margin-bottom: 14px; color: var(--accent); }
+  .verdict-head {
+    font-size: clamp(21px, 3vw, 27px);
+    font-weight: 800;
+    letter-spacing: -.015em;
+    margin: 0 0 14px;
+    line-height: 1.3;
+  }
+  .verdict-head code {
+    font-family: var(--mono);
+    font-size: .88em;
+    background: var(--accent-s);
+    color: var(--accent);
+    padding: 2px 9px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+  .verdict p { color: var(--muted); }
+  .verdict p b { color: var(--ink); font-weight: 600; }
+
+  /* ── tables ────────────────────────────────────────────────────── */
+  .scroll { overflow-x: auto; margin: 0 0 20px; border: 1px solid var(--line); border-radius: 3px; background: var(--surface); }
+  table { border-collapse: collapse; width: 100%; font-size: 14.5px; min-width: 560px; }
+  th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  thead th {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--faint);
+    font-weight: 600;
+    background: var(--sunken);
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  tbody tr:last-child td { border-bottom: none; }
+  td.num, th.num { font-family: var(--mono); font-variant-numeric: tabular-nums; white-space: nowrap; }
+  td code, p code, li code {
+    font-family: var(--mono);
+    font-size: .89em;
+    background: var(--sunken);
+    padding: 1.5px 5px;
+    border-radius: 3px;
+    color: var(--ink);
+  }
+
+  .yes, .no {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .04em;
+    white-space: nowrap;
+  }
+  .yes { color: var(--ok); }
+  .no  { color: var(--warn); }
+
+  /* ── scale ladder ──────────────────────────────────────────────── */
+  .ladder { display: flex; flex-direction: column; gap: 2px; margin: 0 0 24px; }
+  .rung {
+    display: grid;
+    grid-template-columns: 118px 1fr auto;
+    gap: 18px;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    padding: 14px 18px;
+  }
+  .rung:first-child { border-radius: 3px 3px 0 0; }
+  .rung:last-child  { border-radius: 0 0 3px 3px; }
+  .rung-tag {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  .rung-body { font-size: 14.5px; color: var(--muted); }
+  .rung-body b { color: var(--ink); font-weight: 600; }
+  .rung-val {
+    font-family: var(--mono);
+    font-variant-numeric: tabular-nums;
+    font-size: 13px;
+    color: var(--faint);
+    text-align: right;
+    white-space: nowrap;
+  }
+  .rung.hot { border-color: var(--accent); background: var(--accent-s); }
+  .rung.hot .rung-val { color: var(--accent); font-weight: 600; }
+
+  /* ── architecture diagram ──────────────────────────────────────── */
+  .arch { display: flex; flex-direction: column; gap: 10px; margin: 0 0 20px; }
+  .arch-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .box {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 16px 18px;
+  }
+  .box h4 {
+    margin: 0 0 4px;
+    font-size: 15px;
+    font-weight: 700;
+    font-family: var(--mono);
+    letter-spacing: -.01em;
+  }
+  .box p { font-size: 13px; color: var(--muted); margin: 0; line-height: 1.6; }
+  .box.core { border-color: var(--accent); border-left: 3px solid var(--accent); }
+  .box .badge {
+    display: inline-block;
+    font-family: var(--mono);
+    font-size: 10px;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    padding: 2px 7px;
+    border-radius: 2px;
+    margin-bottom: 9px;
+    font-weight: 600;
+  }
+  .badge.have { background: var(--ok-s); color: var(--ok); }
+  .badge.new  { background: var(--warn-s); color: var(--warn); }
+  .arrow {
+    text-align: center;
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--faint);
+    letter-spacing: .06em;
+    padding: 2px 0;
+  }
+
+  /* ── decision cards ────────────────────────────────────────────── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 3px;
+    padding: 20px 22px;
+  }
+  .card .k {
+    font-family: var(--mono);
+    font-size: 11px;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+    display: block;
+    margin-bottom: 10px;
+  }
+  .card h4 { margin: 0 0 8px; font-size: 16px; font-weight: 700; letter-spacing: -.01em; }
+  .card p { font-size: 14px; color: var(--muted); margin: 0 0 10px; }
+  .card p:last-child { margin-bottom: 0; }
+  .card .why {
+    font-size: 13px;
+    color: var(--ink);
+    border-top: 1px dashed var(--line);
+    padding-top: 10px;
+    margin-top: 12px;
+  }
+  .card .why b { font-family: var(--mono); font-size: 12px; color: var(--faint); display: block; margin-bottom: 3px; letter-spacing: .06em; }
+
+  /* ── phases ────────────────────────────────────────────────────── */
+  .phases { display: flex; flex-direction: column; gap: 0; }
+  .phase {
+    display: grid;
+    grid-template-columns: 74px 1fr;
+    gap: 22px;
+    padding: 24px 0;
+    border-bottom: 1px solid var(--line-soft);
+  }
+  .phase:first-child { padding-top: 0; }
+  .phase:last-child { border-bottom: none; padding-bottom: 0; }
+  .phase-n {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: .06em;
+    padding-top: 3px;
+  }
+  .phase-n small { display: block; color: var(--faint); font-weight: 400; letter-spacing: .04em; font-size: 11px; margin-top: 3px; }
+  .phase h3 { margin: 0 0 8px; font-size: 17px; }
+  .phase p { font-size: 14.5px; color: var(--muted); margin: 0 0 10px; }
+  .deliver {
+    font-size: 14px;
+    background: var(--ok-s);
+    color: var(--ink);
+    border-radius: 3px;
+    padding: 10px 14px;
+    display: block;
+  }
+  .deliver b { font-family: var(--mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--ok); display: block; margin-bottom: 3px; }
+
+  ul { margin: 0 0 16px; padding-left: 20px; }
+  li { margin-bottom: 7px; }
+  li::marker { color: var(--faint); }
+
+  .callout {
+    border-left: 3px solid var(--warn);
+    background: var(--warn-s);
+    padding: 16px 20px;
+    border-radius: 0 3px 3px 0;
+    margin: 0 0 20px;
+    font-size: 14.5px;
+  }
+  .callout b { color: var(--ink); }
+  .callout.good { border-left-color: var(--ok); background: var(--ok-s); }
+
+  footer {
+    border-top: 1px solid var(--line);
+    padding-top: 22px;
+    font-size: 13px;
+    color: var(--faint);
+    font-family: var(--mono);
+    letter-spacing: .02em;
+  }
+
+  @media (max-width: 640px) {
+    .arch-row { grid-template-columns: 1fr; }
+    .rung { grid-template-columns: 1fr; gap: 6px; }
+    .rung-val { text-align: left; }
+    .phase { grid-template-columns: 1fr; gap: 8px; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <div class="eyebrow">
+    <span>Humen / 蓝星</span>
+    <span>·</span>
+    <span>渲染技术选型</span>
+    <span>·</span>
+    <span>2026-10-02</span>
+  </div>
+  <h1>蓝星可视化方案</h1>
+  <p class="standfirst">
+    结论先行：<b>用 Unity 3D，不用 Cesium。</b>
+    Cesium 是给<b>真实地球的地理数据</b>做的可视化引擎 —— 而本项目的地形、
+    影像、大陆全部是<b>程序化生成</b>的，恰好没有一样用到它的核心价值。
+  </p>
+</header>
+
+<section>
+  <div class="verdict">
+    <h2>结论</h2>
+    <p class="verdict-head">Unity 3D（本机已装的 <code>Unity 6 · 6000.0.30f1</code>）</p>
+    <p>
+      三条理由，任一条都足以定案：<b>①</b> Cesium 的全部价值在于流式加载真实地形与影像，
+      我们没有真实数据；<b>②</b> 本项目的模拟内核是纯 C#，Unity 也是 C# —— 两边可以直接共享代码，
+      而 Cesium 的两条路（CesiumJS 是 JavaScript、Cesium for Unity 依赖 Cesium ion 在线资产）
+      都要在中间加一层翻译，而这一层会**威胁 INV-34 的逐位可复现**；
+      <b>③</b> `req.txt` 第 1 行写的就是 Unity3D。
+    </p>
+  </div>
+</section>
+
+<section>
+  <h2>Cesium 为什么不合适</h2>
+  <p class="prose">
+    这不是说 Cesium 不好 —— 它在自己那一行里是最好的工具之一。
+    问题是把它逐项对照本项目的需求，会发现<b>它提供的每一项我们都不需要，
+    而我们需要的每一项它都不提供</b>。
+  </p>
+  <div class="scroll">
+    <table>
+      <thead>
+        <tr>
+          <th>Cesium 的核心能力</th>
+          <th>它解决什么问题</th>
+          <th class="num">本项目需要吗</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>3D Tiles</code> 流式加载</td>
+          <td>城市级模型按视锥分块加载，几百 GB 数据也能流畅浏览</td>
+          <td class="num"><span class="no">不需要</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">整颗星球才 32 514 个顶点 · 3.6 MB，一次全装进显存</span></td>
+        </tr>
+        <tr>
+          <td><code>quantized-mesh</code> 地形瓦片</td>
+          <td>真实高程数据（SRTM / 激光雷达）的多分辨率金字塔</td>
+          <td class="num"><span class="no">不需要</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">高程由 §7.4 的噪声函数现算，没有任何外部数据</span></td>
+        </tr>
+        <tr>
+          <td>WGS84 椭球与地理精度</td>
+          <td>让坐标与真实 GPS 对齐，做测绘级应用</td>
+          <td class="num"><span class="no">不需要</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">蓝星是虚构星球，只要 <code>R=1000</code> 的球面几何自洽即可</span></td>
+        </tr>
+        <tr>
+          <td>影像图层（Bing / 天地图…）</td>
+          <td>给地球贴真实卫星照片</td>
+          <td class="num"><span class="no">不需要</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">陆地颜色由 §7.7 的群系决定</span></td>
+        </tr>
+        <tr>
+          <td>Cesium ion 在线资产</td>
+          <td>托管的地形 / 影像 / 模型服务</td>
+          <td class="num"><span class="no">不需要</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">引入账号与网络依赖，且与 §8.5「CI 可复现」冲突</span></td>
+        </tr>
+        <tr>
+          <td>时间动态实体（CZML）</td>
+          <td>实体带时间区间，随时刻出现 / 消失 / 移动</td>
+          <td class="num"><span class="yes">需要 · 但可自建</span><br><span style="font-family:var(--sans);font-size:13px;color:var(--muted)">这是唯一值得借鉴的，见下方「借用其思想」</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="callout">
+    <b>两条路的共同障碍：C# 内核被隔在了外面。</b>
+    CesiumJS 是 JavaScript —— 要用它就得把 30 万年的模拟要么用 JS 重写、
+    要么编译成 WASM 再跨语言调用。而 INV-34 要求<code>Hashing.Hash64</code> 与 <code>Rng</code>
+    的<b>逐位一致</b>，跨语言重实现是这类项目最经典的自毁方式：某天哈希差一位，
+    「同种子两次构建逐位相同」就悄悄不成立了，而外观上看不出任何异常。
+  </div>
+
+  <div class="callout good">
+    <b>值得从 Cesium 借走的一件事：时间动态实体的组织方式。</b>
+    它把「实体 + 可用时段」作为第一性对象的做法，正是我们要的时间轴模型 ——
+    拖到公元前 5 万年，该出现的聚落出现、该消失的消失。
+    <b>借它的思想，不引它的依赖。</b>
+  </div>
+</section>
+
+<section>
+  <h2>尺度：整个方案的第一个约束</h2>
+  <p class="prose">
+    在谈"怎么渲染"之前必须先看一组数。蓝星的 <code>R = 1000 units = 6371 km</code>，
+    于是 <code>1 unit = 6.371 km</code>：
+  </p>
+
+  <div class="ladder">
+    <div class="rung">
+      <span class="rung-tag">行星</span>
+      <span class="rung-body"><b>蓝星本体</b> · 5 块大陆 · 10.89 % 陆地</span>
+      <span class="rung-val">R = 1000 unit</span>
+    </div>
+    <div class="rung">
+      <span class="rung-tag">大陆</span>
+      <span class="rung-body"><b>一座城</b> · 直径约 5 km</span>
+      <span class="rung-val">0.78 unit</span>
+    </div>
+    <div class="rung">
+      <span class="rung-tag">部落</span>
+      <span class="rung-body"><b>一个村落</b> · 直径约 500 m</span>
+      <span class="rung-val">0.079 unit</span>
+    </div>
+    <div class="rung hot">
+      <span class="rung-tag">建筑</span>
+      <span class="rung-body"><b>一间房子</b> · 高 6 m —— 玩家最想看清的东西</span>
+      <span class="rung-val">0.00094 unit</span>
+    </div>
+  </div>
+
+  <p class="prose">
+    一间房是星球半径的<b>百万分之一</b>。所以"拉近看建筑"在几何上是不可能的 ——
+    拉近 5 个数量级已经不是缩放，是另一个场景了。这就是三级视图的由来。
+  </p>
+
+  <div class="callout">
+    <b>顺带解决了一个不那么明显的问题：浮点精度。</b>
+    假设不做分级，把聚落直接建在球面上 —— 世界坐标的量级是 1000，
+    而 float32 在这个量级上的最小可分辨间隔约 <code>6.1e-5</code>。
+    一间 6 m 的房子只有 <code>9.4e-4</code> 单位，<b>横竖只跨十几个浮点台阶</b>，
+    建筑会肉眼可见地抖动、Z-fighting。
+    「聚落单独一个场景、坐标居中在原点」最初只是为了让玩家看得清 ——
+    <b>现在它是数值上的必需品。</b>
+  </div>
+</section>
+
+<section>
+  <h2>架构</h2>
+  <p class="prose">
+    关键点：<b>依赖方向是单向的。</b> §8.5 要求 <code>Humen.Core</code> 不引用 UnityEngine，
+    这条不能破 —— 所以让 Unity 去引用 Core，而不是反过来。
+    Core 保持纯净、可在 CI 里复现；Unity 只是一个消费者。
+  </p>
+
+  <div class="arch">
+    <div class="arch-row">
+      <div class="box core">
+        <span class="badge have">已有</span>
+        <h4>Humen.Core</h4>
+        <p>纯 C#，无 Unity 依赖。大陆 / 高程 / 河流 / 部落 / 气候 / 土壤。<br>新增：聚落布局规则。</p>
+      </div>
+      <div class="box">
+        <span class="badge have">已有</span>
+        <h4>Humen.Cli</h4>
+        <p>命令行 + 23 项不变量验收。<br>CI 复现的唯一入口。</p>
+      </div>
+      <div class="box">
+        <span class="badge new">新建</span>
+        <h4>Humen.Unity</h4>
+        <p>Unity 6 + URP。三级视图、相机、时间轴 UI、检视器。</p>
+      </div>
+    </div>
+    <div class="arrow">↑ 引用（Core 不反向引用 Unity —— §8.5 不破）</div>
+  </div>
+
+  <h3>建筑布局放 Core，网格生成放 Unity</h3>
+  <p class="prose">
+    这是本方案最要紧的一条切分。Core 不产出 <code>GameObject</code>，
+    而是产出一份<b>声明式的建筑清单</b> —— 纯数据：
+  </p>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>字段</th><th>含义</th><th>为什么在 Core</th></tr></thead>
+      <tbody>
+        <tr><td class="num">构件类型</td><td>土坯房 / 公仓 / 神庙 / 烟囱 …</td><td>由科技节点决定（§10.4），是模拟的一部分</td></tr>
+        <tr><td class="num">位置 · 朝向 · 尺寸</td><td>聚落局部坐标</td><td>必须可复现，必须能脱离 Unity 做单元测试</td></tr>
+        <tr><td class="num">材质 ID</td><td>草 / 土坯 / 石 / 砖 / 玻璃 …</td><td>同上</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="prose">
+    好处直白：<b>聚落布局可以在没有 Unity 的情况下跑测试</b> ——
+    「公元前 8000 年的这个部落应该有 170 栋土坯房、0 座神庙」这种断言，
+    在 CI 里就能验，不必开编辑器。Unity 拿到清单只做一件事：把构件变成网格并按类型 GPU 实例化。
+  </p>
+</section>
+
+<section>
+  <h2>四个关键技术决定</h2>
+  <div class="cards">
+    <div class="card">
+      <span class="k">决定 01</span>
+      <h4>三级视图</h4>
+      <p>轨道（发光点）→ 大陆（聚落斑块）→ 聚落（真实建筑）。
+         <b>只有焦点部落</b>拥有完整几何。</p>
+      <p class="why"><b>与 §3.1 对齐</b>模拟层的「焦点部落」与渲染层的「焦点部落」是同一个焦点 —— 玩家"点进去"在两层的含义一致，不会穿帮成"看得见一千个村民却不模拟他们"。</p>
+    </div>
+    <div class="card">
+      <span class="k">决定 02</span>
+      <h4>B→C 是「降落」，不是缩放</h4>
+      <p>点选部落 → 切入一个<b>独立的局部场景</b>，坐标居中在原点。</p>
+      <p class="why"><b>两个理由</b>B 到 C 差 6371 倍，连续缩放要让 100 个部落都持有完整几何；且居中在原点同时消除了浮点抖动。局部地面可以铺<b>平地</b> —— 5 km 跨度上球面只下垂 0.49 m。</p>
+    </div>
+    <div class="card">
+      <span class="k">决定 03</span>
+      <h4>时间轴是纯函数，不是累加器</h4>
+      <p>拖拽滑条 = <code>SeekTo(年)</code>，<b>不是</b>"快进"。
+         时钟按整数年推进，绝不用 <code>Time.deltaTime</code> 驱动模拟。</p>
+      <p class="why"><b>为什么</b>INV-12 / ID-15 要求结果与帧率、播放速度、LOD 无关。一旦让 <code>deltaTime</code> 参与，同一年的世界在 30 fps 和 60 fps 下就会分叉。</p>
+    </div>
+    <div class="card">
+      <span class="k">决定 04</span>
+      <h4>Core 多目标编译</h4>
+      <p>Core 从 <code>net8.0</code> 扩为 <code>net8.0;netstandard2.1</code>，
+         让 Unity 6 与 CLI 共用同一份源码。</p>
+      <p class="why"><b>已知的坑</b><code>PlanetRaster</code> 用了 <code>System.Numerics.BitOperations.PopCount</code>，那是 .NET Core 3.0+ 的 API，netstandard2.1 里没有 —— 需要一个小 shim 或条件编译。这是唯一的移植点。</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>分阶段方案</h2>
+  <p class="prose">
+    四个阶段，<b>每一阶段结束时都有能看的东西</b> —— 这是对"只看到静态图片"的直接回应。
+  </p>
+
+  <div class="phases">
+    <div class="phase">
+      <div class="phase-n">M4b-1<small>地基</small></div>
+      <div>
+        <h3>工程骨架与蓝星</h3>
+        <p>
+          建 Unity 6 工程，<b>第一步先跑通 URP 模板再写业务代码</b>
+          （Unity 6 的 URP 配置与 2022.3 不同，反过来做会返工）。
+          导入已有的 <code>planet_surface.obj</code>，写轨道相机。
+        </p>
+        <span class="deliver"><b>看得见</b>一颗能转、能缩放的蓝色星球，5 块大陆清晰可辨</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">M4b-2<small>要素</small></div>
+      <div>
+        <h3>河流与部落</h3>
+        <p>
+          从 Core 取 5 条主河 + 25 条支流的样条，生成带状网格。
+          100 个部落画成 GPU 实例化的图标（直径 ∝ √人口）。
+        </p>
+        <span class="deliver"><b>看得见</b>需求原文的那张图：每块大陆一条河，河上 20 个部落</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">M4b-3<small>降落</small></div>
+      <div>
+        <h3>点进去：聚落场景</h3>
+        <p>
+          Core 产出建筑清单（§10.2 形态阶梯 + §10.4 科技映射），
+          Unity 把清单变成实例化网格。此时还没有演化 —— 所有部落都停在元年。
+        </p>
+        <span class="deliver"><b>看得见</b>点一个部落，降落到它的村落里，看见房子、火塘、田块</span>
+      </div>
+    </div>
+
+    <div class="phase">
+      <div class="phase-n">M5<small>时钟</small></div>
+      <div>
+        <h3>时间轴</h3>
+        <p>
+          时钟 + 播放 / 倍速 / 拖拽 / 跳转。接上 M4b-3 的聚落场景之后，
+          拖动滑条就能看见聚落形态变化。<b>真正的"进化"要等 M7 的进化引擎。</b>
+        </p>
+        <span class="deliver"><b>看得见</b>拖动滑条，世界跟着变 —— 虽然此刻变化的是环境而非文明</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>风险与对策</h2>
+  <div class="scroll">
+    <table>
+      <thead><tr><th>风险</th><th>后果</th><th>对策</th></tr></thead>
+      <tbody>
+        <tr>
+          <td>Unity 6 的 URP 配置与文档不符</td>
+          <td>先写业务代码再补渲染管线 → 大面积返工</td>
+          <td>M4b-1 的<b>第一个动作</b>就是跑通 URP 空场景并提交</td>
+        </tr>
+        <tr>
+          <td>误用 Unity 的随机数 / 时间</td>
+          <td>外观随帧率漂移，INV-34 静默失效</td>
+          <td>几何一律 <code>f(seed, tribeId, year)</code>；
+              加一条不变量扫描：同一年的世界连算两次，几何清单必须逐位相同</td>
+        </tr>
+        <tr>
+          <td>Core 移植到 netstandard2.1</td>
+          <td>编译不过</td>
+          <td>已知只有 <code>BitOperations.PopCount</code> 一处，加 shim 即可</td>
+        </tr>
+        <tr>
+          <td>100 个部落的性能</td>
+          <td>掉帧</td>
+          <td>设计上就不允许 100 个部落同时展开 —— 只有焦点部落吃几何，
+              其余全是实例化图标</td>
+        </tr>
+        <tr>
+          <td>「建筑」类科技节点只有 2 个</td>
+          <td>可造的构件种类不足以撑起 L0~L9 的形态阶梯</td>
+          <td>§10.4 已列出 35 项可见产物待补；<b>是否扩充 <code>tech_tree.md</code> 的建筑节点，待作者裁定</b></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<footer>
+  对应 design.md §10.1~§10.6 · Unity 6 裁定见 §13.3 · 本方案尚未实施
+</footer>
+
+</div>

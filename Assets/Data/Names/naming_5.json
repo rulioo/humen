@@ -1,0 +1,8 @@
+﻿{
+  "continent": 5,
+  "style": "极地风",
+  "structure": "头音节 + 三音节",
+  "combinationSpace": 126247696,
+  "head": ["qa", "nu", "tu", "pi", "la", "ka", "ma", "si", "na", "uk", "ik", "ak", "ek", "ok", "aq", "iq", "qu", "su", "mu", "nu", "lu", "ku", "pu", "ru", "ta", "sa", "nga", "nng", "qaa", "qii", "quu", "qaq", "tup", "qan", "nan", "sik", "ila", "mal", "kuk", "suk", "ang", "ing", "ung", "ang", "tuk", "puk", "qila", "nuna", "siku", "tiri", "kala", "maku", "putu", "sana", "tala", "qimu", "nivi", "ukiu", "aqqa", "inuk", "angak", "tupil", "qiviu", "nanuq", "ukali", "sikuu", "qanni", "pikki", "tunni", "millu", "arsa", "kang", "qer", "nuk", "tuk", "sav", "imi", "qer", "tasi", "uqaq", "ping", "suli", "kala", "isik", "takk", "sior", "nipa", "qaqq", "kuja", "kimm", "igdl", "erli", "tasi", "naner", "aulla", "eqqa", "tikk", "qaqo", "nuni", "sila", "qila", "pikk", "tunu", "sann", "matt", "qimu"],
+  "body": ["qa", "nu", "tu", "pi", "la", "ka", "ma", "si", "na", "uk", "ik", "ak", "ek", "ok", "aq", "iq", "qu", "su", "mu", "nu", "lu", "ku", "pu", "ru", "ta", "sa", "nga", "nng", "qaa", "qii", "quu", "qaq", "tup", "qan", "nan", "sik", "ila", "mal", "kuk", "suk", "ang", "ing", "ung", "ang", "tuk", "puk", "qila", "nuna", "siku", "tiri", "kala", "maku", "putu", "sana", "tala", "qimu", "nivi", "ukiu", "aqqa", "inuk", "angak", "tupil", "qiviu", "nanuq", "ukali", "sikuu", "qanni", "pikki", "tunni", "millu", "arsa", "kang", "qer", "nuk", "tuk", "sav", "imi", "qer", "tasi", "uqaq", "ping", "suli", "kala", "isik", "takk", "sior", "nipa", "qaqq", "kuja", "kimm", "igdl", "erli", "tasi", "naner", "aulla", "eqqa", "tikk", "qaqo", "nuni", "sila", "qila", "pikk", "tunu", "sann", "matt", "qimu"]
+}

@@ -1,0 +1,8 @@
+﻿{
+  "continent": 4,
+  "style": "北欧风",
+  "structure": "头音节 + 三音节",
+  "combinationSpace": 84934656,
+  "head": ["sig", "hal", "stein", "bjorn", "ulf", "rag", "nar", "eir", "ast", "rid", "gunn", "hild", "thor", "odin", "fre", "loki", "bal", "tyr", "heim", "gard", "vall", "skag", "fjor", "eyr", "thor", "vald", "grim", "sver", "ing", "ald", "marr", "ket", "til", "ey", "dis", "ger", "svein", "bjart", "nir", "hjal", "mar", "skul", "run", "olaf", "hav", "knut", "leif", "sten", "arv", "vid", "arn", "frid", "leif", "tork", "esb", "jor", "han", "sax", "ulf", "kel", "sigr", "bryn", "holl", "yst", "rann", "veig", "dyr", "hraf", "sael", "mold", "eyv", "asg", "thor", "vind", "hrann", "logi", "finn", "eirik", "snae", "hel", "ymir", "aeg", "bur", "gisl", "brand", "skal", "varg", "hauk", "ormr", "falk", "reyr", "gaut", "styr", "haddr", "ingi", "sverr"],
+  "body": ["sig", "hal", "stein", "bjorn", "ulf", "rag", "nar", "eir", "ast", "rid", "gunn", "hild", "thor", "odin", "fre", "loki", "bal", "tyr", "heim", "gard", "vall", "skag", "fjor", "eyr", "thor", "vald", "grim", "sver", "ing", "ald", "marr", "ket", "til", "ey", "dis", "ger", "svein", "bjart", "nir", "hjal", "mar", "skul", "run", "olaf", "hav", "knut", "leif", "sten", "arv", "vid", "arn", "frid", "leif", "tork", "esb", "jor", "han", "sax", "ulf", "kel", "sigr", "bryn", "holl", "yst", "rann", "veig", "dyr", "hraf", "sael", "mold", "eyv", "asg", "thor", "vind", "hrann", "logi", "finn", "eirik", "snae", "hel", "ymir", "aeg", "bur", "gisl", "brand", "skal", "varg", "hauk", "ormr", "falk", "reyr", "gaut", "styr", "haddr", "ingi", "sverr"]
+}

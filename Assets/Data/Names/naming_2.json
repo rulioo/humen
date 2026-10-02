@@ -1,0 +1,8 @@
+﻿{
+  "continent": 2,
+  "style": "南岛海洋风",
+  "structure": "头音节 + 三音节",
+  "combinationSpace": 54700816,
+  "head": ["ta", "ra", "ngi", "mo", "ka", "ha", "va", "ni", "pu", "sa", "te", "ki", "ru", "ma", "no", "li", "wa", "fu", "si", "tu", "ne", "po", "ga", "hi", "ja", "la", "mi", "oa", "pi", "ro", "su", "to", "ua", "we", "ba", "de", "fi", "gu", "lu", "na", "ri", "se", "ti", "vu", "ai", "ei", "ou", "ui", "anga", "enga", "inga", "onga", "unga", "ara", "ere", "iri", "oro", "uru", "ami", "emi", "imo", "omu", "tai", "rei", "noa", "hua", "kia", "manu", "rangi", "moana", "whenua", "tapu", "ariki", "toa", "hine", "tane", "wai", "kai", "roa", "iti", "nui", "poto", "mata", "nga", "whare", "papa"],
+  "body": ["ta", "ra", "ngi", "mo", "ka", "ha", "va", "ni", "pu", "sa", "te", "ki", "ru", "ma", "no", "li", "wa", "fu", "si", "tu", "ne", "po", "ga", "hi", "ja", "la", "mi", "oa", "pi", "ro", "su", "to", "ua", "we", "ba", "de", "fi", "gu", "lu", "na", "ri", "se", "ti", "vu", "ai", "ei", "ou", "ui", "anga", "enga", "inga", "onga", "unga", "ara", "ere", "iri", "oro", "uru", "ami", "emi", "imo", "omu", "tai", "rei", "noa", "hua", "kia", "manu", "rangi", "moana", "whenua", "tapu", "ariki", "toa", "hine", "tane", "wai", "kai", "roa", "iti", "nui", "poto", "mata", "nga", "whare", "papa"]
+}

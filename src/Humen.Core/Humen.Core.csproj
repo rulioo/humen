@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    Humen.Core —— 纯 C# 数据与模拟内核。
+
+    ⚠️ 本工程【不得】引用 UnityEngine。
+       依据 design.md §8.5：「生成器与 UnityEngine 解耦（纯 C#），可在 CI 中复现验证」。
+       Unity 侧的 MonoBehaviour 包装放在 Assets/Scripts/ 下，单向依赖本工程。
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <LangVersion>12.0</LangVersion>
+    <RootNamespace>Humen.Core</RootNamespace>
+    <AssemblyName>Humen.Core</AssemblyName>
+
+    <!-- 确定性要求：不接受任何依赖当前区域设置/时间/环境的隐式行为 -->
+    <InvariantGlobalization>true</InvariantGlobalization>
+    <Deterministic>true</Deterministic>
+    <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="10.0.12" />
+  </ItemGroup>
+
+</Project>

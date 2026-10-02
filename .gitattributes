@@ -1,0 +1,49 @@
+# ─────────────────────────────────────────────────────────────
+#  蓝星 Humen · 行尾与二进制规则
+#
+#  为什么非要有这个文件：**Windows 启动脚本对行尾和编码是敏感的。**
+#  `启动.cmd` 必须是 ANSI(936) + CRLF —— 这是本机实测过的约束。
+#  git 默认的 autocrlf 会把行尾换掉，clone 出来的 .cmd 就可能跑不起来，
+#  而症状是「菜单标题变成乱码 / 批处理莫名其妙失败」，很难联想到版本控制。
+#  所以这里**显式钉死**，不依赖每台机器的 core.autocrlf 设置。
+# ─────────────────────────────────────────────────────────────
+
+# Windows 批处理：必须是 CRLF，且按文本处理（不要当二进制）
+*.cmd   text eol=crlf
+*.bat   text eol=crlf
+
+# 源码与文档：进仓库统一存 LF，检出时按平台还原
+.gitignore  text eol=lf
+.gitattributes text eol=lf
+*.cs    text eol=lf
+*.md    text eol=lf
+*.txt   text eol=lf
+*.json  text eol=lf
+*.py    text eol=lf
+*.yml   text eol=lf
+
+# Unity 的 YAML（场景 / 材质 / meta）：必须原样，**不要做任何行尾转换**
+# —— Unity 会按字节比较，改一个行尾就可能被判成「资源被外部修改」。
+*.unity  -text
+*.prefab -text
+*.asset  -text
+*.meta   -text
+*.mat    -text
+*.controller -text
+
+# 二进制资源
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.exr   binary
+*.tga   binary
+*.psd   binary
+*.dll   binary
+*.pdb   binary
+*.so    binary
+*.db    binary
+
+# 让 git 在 diff 里把 Unity 的 YAML 当单行看，避免刷屏
+*.unity  -diff
+*.prefab -diff
+*.asset  -diff

@@ -1,0 +1,8 @@
+﻿{
+  "continent": 3,
+  "style": "热带部落风",
+  "structure": "头音节 + 三音节",
+  "combinationSpace": 78074896,
+  "head": ["ka", "ba", "la", "ma", "na", "ta", "sa", "wa", "ya", "za", "da", "ga", "ha", "ja", "pa", "ra", "be", "le", "me", "ne", "se", "te", "we", "ye", "ze", "de", "ge", "ke", "pe", "re", "ve", "ce", "bi", "li", "mi", "ni", "si", "ti", "wi", "yi", "zi", "di", "gi", "ki", "pi", "ri", "vi", "ci", "bo", "lo", "mo", "no", "so", "to", "wo", "yo", "zo", "do", "go", "ko", "po", "ro", "vo", "co", "bu", "lu", "mu", "nu", "su", "tu", "wu", "yu", "zu", "du", "gu", "ku", "pu", "ru", "vu", "cu", "nko", "mba", "ndi", "ngu", "nta", "sse", "kwe", "lya", "mwi", "nye", "twa", "zha", "shi", "chi"],
+  "body": ["ka", "ba", "la", "ma", "na", "ta", "sa", "wa", "ya", "za", "da", "ga", "ha", "ja", "pa", "ra", "be", "le", "me", "ne", "se", "te", "we", "ye", "ze", "de", "ge", "ke", "pe", "re", "ve", "ce", "bi", "li", "mi", "ni", "si", "ti", "wi", "yi", "zi", "di", "gi", "ki", "pi", "ri", "vi", "ci", "bo", "lo", "mo", "no", "so", "to", "wo", "yo", "zo", "do", "go", "ko", "po", "ro", "vo", "co", "bu", "lu", "mu", "nu", "su", "tu", "wu", "yu", "zu", "du", "gu", "ku", "pu", "ru", "vu", "cu", "nko", "mba", "ndi", "ngu", "nta", "sse", "kwe", "lya", "mwi", "nye", "twa", "zha", "shi", "chi"]
+}

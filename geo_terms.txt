@@ -1,0 +1,36 @@
+共 34 个不同词条，40 次引用
+
+铜矿	3次	copper_ore, copper_smelt, bronze
+黏土	2次	my_new_thing, pottery
+草原	2次	horse_dom, horse_power
+锡矿	2次	tin_ore, bronze
+铁矿石	2次	iron_ore, iron
+盐泉	1次	salt
+海盐	1次	salt
+岩盐	1次	salt
+可耕地	1次	planting
+野马	1次	horse_dom
+甘蔗	1次	sugar
+甜菜	1次	sugar
+宝石矿	1次	gem_gather
+美石河滩	1次	gem_gather
+沙金	1次	gold
+金矿	1次	gold
+银矿	1次	silver
+铅银矿	1次	silver
+牛草场	1次	ox_power
+金银矿	1次	money
+麻	1次	paper
+树皮	1次	paper
+竹	1次	paper
+石英砂	1次	glass
+草木灰/碱	1次	glass
+硝土	1次	niter
+硝石矿	1次	niter
+硫磺	1次	gunpowder
+煤矿	1次	coal_fuel
+油田	1次	petroleum
+金属	1次	battery
+锌矿	1次	zinc
+铀矿	1次	nuclear_power
+深部矿体	1次	deep_mining_robot
