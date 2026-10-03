@@ -64,6 +64,7 @@ echo    [14] 打开 Unity 编辑器（可自由飞行）
 echo    [15] 重建聚落场景                            约 3 分钟
 echo    [16] 渲染聚落演化对比图  unity_settlement_*.png 约 5 分钟
 echo    [17] 生成可执行程序     unity\Build\Windows\Humen.exe 约 5 分钟
+echo    [18] 渲染时间轴进化图   unity_tl_*.png 约 5 分钟
 echo    --------------------------------------------------------
 echo    [0]  退出
 echo   ========================================================
@@ -91,6 +92,7 @@ if "%CH%"=="14" goto do_unity_open
 if "%CH%"=="15" goto do_settle_scene
 if "%CH%"=="16" goto do_settle_eras
 if "%CH%"=="17" goto do_player
+if "%CH%"=="18" goto do_timeline_eras
 if "%CH%"=="0" goto done
 
 echo.
@@ -259,6 +261,13 @@ rem     打包前 Unity 会先自动重建两个场景吗？不会 —— 所以改过场景生成器的话，
 rem     先跑 [12] 与 [15]，再回来打包。这一条以前是靠人记着的，现在写在这里。
 call :unity_run PlayerBuilder.BuildWindowsBatch "生成可执行程序"
 if exist "%~dp0unity\Build\Windows\Humen.exe" echo   产物：unity\Build\Windows\Humen.exe
+call :pause_back
+goto menu
+
+:do_timeline_eras
+rem  一次出 26 张：同一块大陆、同一个机位，只有年份不同 —— 时间轴取证。
+rem  两年份之间只有年份在变，故画面上变了的就是进化，没变的就是没做出来。
+call :unity_run TimelinePreviewRenderer.RenderBatch "渲染时间轴进化图"
 call :pause_back
 goto menu
 

@@ -19,6 +19,8 @@ namespace Humen.Planet
         [Header("图层")]
         public TribeMarkerLayer Markers;
         public RiverLayer Rivers;
+        public TerritoryLayer Territory;
+        public TradeRouteLayer Routes;
 
         [Header("时间")]
         [Tooltip("当前年份。区间从世界快照的 timeline 读，不必手填。")]
@@ -44,6 +46,8 @@ namespace Humen.Planet
         {
             if (Markers == null) Markers = GetComponentInChildren<TribeMarkerLayer>();
             if (Rivers == null) Rivers = GetComponentInChildren<RiverLayer>();
+            if (Territory == null) Territory = GetComponentInChildren<TerritoryLayer>();
+            if (Routes == null) Routes = GetComponentInChildren<TradeRouteLayer>();
 
             if (Markers != null && Markers.Ready)
             {
@@ -101,6 +105,10 @@ namespace Humen.Planet
 
             _lastCamToSurface = toSurface;
             Markers.Build();
+            // 路的线宽同样按相机到地表的距离反比缩放（见 TradeRouteLayer.SizeZoom），
+            // 故推拉之后也必须重建 —— 只重建标记的话，标记变了大小而路没变，
+            // 画面上会出现"地图图钉缩了、路却还是原来那么粗"的错位。
+            if (Routes != null && Routes.Ready) Routes.Build();
         }
 
         private void HandleInput()
@@ -139,6 +147,11 @@ namespace Humen.Planet
         public void Apply()
         {
             if (Markers != null && Markers.Ready) Markers.SetYear(Year);
+            if (Territory != null && Territory.Ready) Territory.SetYear(Year);
+            // ⚠ 道路必须排在疆域与标记<b>之后</b>：它按相机到地表的距离反比缩放线宽
+            //   （见 TradeRouteLayer.SizeZoom），而那个距离在滚轮推拉之后才变 ——
+            //   这里紧跟标记重建，读到的才是这一帧真正的相机档位。
+            if (Routes != null && Routes.Ready) Routes.SetYear(Year);
         }
 
         public void SetYear(double year)
@@ -178,15 +191,30 @@ namespace Humen.Planet
             }
             string line3 = sb.ToString();
 
-            string line4 = Playing ? "▶ 时间流动中（空格暂停 · ←→ 拖动 · Home/End 跳转）"
-                                   : "⏸ 已暂停（空格继续 · ←→ 拖动 · Home/End 跳转）";
+            // 疆域与道路的读数。两者都是"文明铺开到地上"的量：
+            // 部落数只说明"有多少个点"，而这两个数说明"占了多少地、连了多少线" ——
+            // 拖动时间轴时，它们从 0 开始涨，是画面上最该被看见的那条曲线。
+            var sb2 = new System.Text.StringBuilder();
+            if (Territory != null && Territory.Ready) sb2.Append($"疆域 {Territory.TerritoryCount} 块");
+            if (Routes != null && Routes.Ready)
+            {
+                if (sb2.Length > 0) sb2.Append(" · ");
+                sb2.Append($"道路 {Routes.RouteCount} 条（连着 {Routes.ConnectedTribeCount} 个聚落）");
+            }
+            string line4 = sb2.ToString();
+
+            // 复位键必须写在这一行里。它是**唯一**告诉玩家"转乱了怎么回来"的地方 ——
+            // v0.27 加了 F 复位，若只写在代码里，玩家转乱之后是找不到它的。
+            string line5 = (Playing ? "▶ 时间流动中" : "⏸ 已暂停")
+                         + "（空格播放/暂停 · ←→ 拖动 · Home/End 跳转 · F 复位地球）";
 
             // 描边：星球上有大片浅色地表，纯白字会糊在里面
             var shadow = new GUIStyle(_style);
             shadow.normal.textColor = new Color(0f, 0f, 0f, 0.65f);
 
-            var rect = new Rect(14, 10, 720, 100);
-            string text = year + "\n" + line2 + "\n" + line3 + "\n" + line4;
+            var rect = new Rect(14, 10, 720, 120);
+            string text = year + "\n" + line2 + "\n" + line3 + "\n"
+                        + (line4.Length > 0 ? line4 + "\n" : "") + line5;
             GUI.Label(new Rect(rect.x + 1, rect.y + 1, rect.width, rect.height), text, shadow);
             GUI.Label(rect, text, _style);
         }

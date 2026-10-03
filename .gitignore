@@ -49,11 +49,27 @@ logs/
 *.log
 unity-capture/
 
+# ⚠️ 注意 `*.log` **匹配不到** `capture_v28.log.err`（那个名字以 `.err` 结尾）。
+#    v0.28 那轮用 `-RedirectStandardOutput` 抓 Unity 的输出，结果只多出这么一个
+#    **0 字节**的文件（Debug.Log 走的是 Player.log，不在 stdout 上）——
+#    而它在 `git status` 里就是一条 `??`，`git add -A` 会照收。
+#    所以按**形状**再兜一层，免得下次换个名字又绕过去。
+*.log.err
+
 # unity/ 根目录下的取证图（unity_continent_*.png 等）。
 # ⚠️ 只匹配根目录 —— `unity/Assets/Resources/Planet/*.png` 是**贴图**，
 #    是工程能不能跑起来的一部分，**必须跟踪**，别写成 `**/*.png` 把它们一起干掉。
 #    这些渲染产物用 unity/README.md 里的 `humen planet` 一行命令就能重出。
 /unity/*.png
+
+# 播放器截屏的输出目录（`-humen-capture <目录>`，v0.26 起用于验时间轴）。
+# 同上：跑出来的东西，一条命令就能重出，不进库。
+/unity/capture/
+# ⚠️ 但 `-humen-capture` 的目录是**命令行给的**，所以它落在哪儿不由这里决定 ——
+#    v0.27 那轮就给了个根目录下的 `capture_v27/`，于是绕开了上面这条精确匹配，
+#    8 张 PNG 差点跟着 `git add -A` 进库。
+#    所以这里按**形状**兜底：根目录下 `capture*` 开头的目录一律不进库。
+/capture*/
 
 # 根目录的取证图：编辑器离屏出图与播放器截屏
 # （`humen planet` / `-humen-capture`，见 unity/README.md）。

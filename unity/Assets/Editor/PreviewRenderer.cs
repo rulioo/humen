@@ -302,6 +302,12 @@ namespace Humen.EditorTools
             var rivers = Object.FindFirstObjectByType<RiverLayer>();
             if (rivers != null) { rivers.Load(); rivers.Build(); }
 
+            var territory = Object.FindFirstObjectByType<TerritoryLayer>();
+            if (territory != null) { territory.Load(); territory.Build(); }
+
+            var routes = Object.FindFirstObjectByType<TradeRouteLayer>();
+            if (routes != null) { routes.Load(); routes.Build(); }
+
             var markers = Object.FindFirstObjectByType<TribeMarkerLayer>();
             if (markers != null) { markers.Load(); markers.Build(); }
 

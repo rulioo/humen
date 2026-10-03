@@ -194,7 +194,13 @@ namespace Humen.Planet
                 // 剩下的时候"天上有月亮"与"没有月亮"在画面上**一模一样** ——
                 // 而这正是本项目真栽过的那个跟头：图里没有月亮，却被当成有。
                 // 一行字把"它在画面外"与"它没被造出来"分开。
-                body += MoonVisible() ? "\n月亮：在画面里" : "\n月亮：已转到画面外（一圈约 27 分钟，会转回来）";
+                body += "\n月亮：" + MoonSightingText();
+                // 太阳也要读得出来，而且比月亮更紧要：v0.28 起太阳在 1012R，
+                // 默认第一屏的日盘**必然**不在画面里（日盘在画面里 ⟺ 蓝星是暗的，
+                // 见 SunMoonSystem 类注释里的 δ + φ = 180° − ε，ε≈0.14°）。
+                // 也就是说"首屏没有太阳"是**正常态**，不是故障 —— 而它跟"太阳压根没被造出来"
+                // 在截图上长得一模一样，正是本项目栽过的那款跟头。所以连偏角一起报。
+                body += "\n太阳：" + SunSightingText();
             }
 
             if (!string.IsNullOrEmpty(_note)) body += $"\n\n{_note}";
@@ -218,13 +224,64 @@ namespace Humen.Planet
             GUI.Label(new Rect(rect.x + 10f, rect.y + 8f, rect.width - 20f, rect.height - 16f), body, _style);
         }
 
-        /// <summary>月亮此刻在不在画面里。<b>判据用最终真正作数的那个</b>（投影到 viewport），
-        /// 而不是"离视轴多少度"—— 视锥是竖直的，横向还宽 1.87 倍，算出来在画面里与确实在画面里是两回事。</summary>
-        private bool MoonVisible()
+        /// <summary>
+        /// 月亮此刻的处境，写成一行字。
+        ///
+        /// <b>四种"看不见"要分得开</b>，理由写在 <see cref="SunMoonSystem.MoonSighting"/> 上 ——
+        /// 一句话：它们在截图上长得一模一样，而"分不开"正是本工程把太阳认成月亮、
+        /// 并把这个结论写进报告的那条路。
+        ///
+        /// ⚠️ <b>"被蓝星挡住"这一态是 v0.27 才补上的，而它当场就抓到了一个真问题：</b>
+        ///    新机位下开场的月亮恰好躲在蓝星背后，屏幕上没有月亮，
+        ///    而旧的两态判定（只看视口）报告的是「在画面里」。
+        ///    判据本身（投影到 viewport）原来是对的、注释里也写明了理由，
+        ///    漏的只是"投影在视口内"→"真的看得见"之间那一步。
+        /// </summary>
+        private string MoonSightingText()
         {
-            if (_cam == null || _sky == null) return false;
-            Vector3 v = _cam.WorldToViewportPoint(_sky.MoonPosition);
-            return v.z > 0f && v.x > 0f && v.x < 1f && v.y > 0f && v.y < 1f;
+            if (_sky == null) return "（场景里没有 SunMoonSystem）";
+            switch (_sky.SightMoon(_cam))
+            {
+                case SunMoonSystem.MoonSighting.NotBuilt:
+                    return "**根本没造出来**（Awake 没跑？—— 这不该发生，是个 bug）";
+                case SunMoonSystem.MoonSighting.OffScreen:
+                    return "已转到画面外（一圈约 27 分钟，会转回来）";
+                case SunMoonSystem.MoonSighting.BehindPlanet:
+                    return "**正躲在蓝星背后**（在视锥内，但被挡住 —— 会自己转出来）";
+                default:
+                    return "在画面里";
+            }
+        }
+
+        /// <summary>
+        /// 太阳此刻的处境，写成一行字。与月亮同一套思路，但多一态（"在镜头背后"）——
+        /// v0.28 之后那是太阳的<b>常态</b>，不是异常。
+        ///
+        /// ⚠️ 这一行里<b>偏角比状态词重要</b>。状态词只说"看不见"，偏角则把
+        /// 相机-蓝星-太阳那个三角形的内角和直接摆出来（<c>δ + φ = 180° − ε</c>，
+        /// ε 是太阳的视差角 ≈0.14°，默认 φ=55° ⟹ <b>124.86°</b>）：
+        /// 往夜面拖，这个数会一路减到 45.7° 以下 —— 那一刻日盘进画面，
+        /// 而<b>同一批读数里蓝星应当同时变暗</b>。两者同向出现，才证明太阳真的在跟着拨；
+        /// 只看"日盘进画面了"不够，因为把世界冻住也能得到一张好看的图。
+        /// 角度在出画、乃至退到镜头背后之后仍然有定义，所以它是唯一能把整条轨迹读完的量。
+        /// </summary>
+        private string SunSightingText()
+        {
+            if (_sky == null) return "（场景里没有 SunMoonSystem）";
+            string off = $"（离视轴 {_sky.SunOffAxisDeg(_cam):F1}°）";
+            switch (_sky.SightSun(_cam))
+            {
+                case SunMoonSystem.SunSighting.NotBuilt:
+                    return "**根本没造出来**（Awake 没跑？—— 这不该发生，是个 bug）";
+                case SunMoonSystem.SunSighting.BehindCamera:
+                    return $"**在镜头背后**{off} —— 默认机位的正常态，往夜面拖会升进画面";
+                case SunMoonSystem.SunSighting.OffScreen:
+                    return $"已转到画面外{off}（视锥横向半角 45.7°，再往夜面拖就进来了）";
+                case SunMoonSystem.SunSighting.BehindPlanet:
+                    return $"**正躲在蓝星背后**{off}（在视锥内，但被挡住）";
+                default:
+                    return $"在画面里{off} —— ⚠️ 此刻蓝星是暗的（日盘可见 ⟺ 蓝星背光）";
+            }
         }
     }
 }

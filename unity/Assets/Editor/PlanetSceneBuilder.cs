@@ -49,6 +49,23 @@ namespace Humen.EditorTools
             rivers.Load();
             rivers.Build();
 
+            // 疆域垫在最底下（HeightScale 最低），路在它之上，标记在最上面。
+            // 三层都挂在蓝星下面、跟着球一起自转 —— 挂到场景根上的话，
+            // 球转了而图层不转，肉眼一看就是错的（与河流那条同源）。
+            var territoryGo = new GameObject("Territory");
+            territoryGo.transform.SetParent(planet.transform, false);
+            var territory = territoryGo.AddComponent<TerritoryLayer>();
+            territory.Radius = PlanetRadius;
+            territory.Load();
+            territory.Build();
+
+            var routeGo = new GameObject("Routes");
+            routeGo.transform.SetParent(planet.transform, false);
+            var routes = routeGo.AddComponent<TradeRouteLayer>();
+            routes.Radius = PlanetRadius;
+            routes.Load();
+            routes.Build();
+
             var markerGo = new GameObject("Tribes");
             markerGo.transform.SetParent(planet.transform, false);
             var markers = markerGo.AddComponent<TribeMarkerLayer>();
@@ -59,6 +76,8 @@ namespace Humen.EditorTools
             var timeline = planet.AddComponent<WorldTimeline>();
             timeline.Markers = markers;
             timeline.Rivers = rivers;
+            timeline.Territory = territory;
+            timeline.Routes = routes;
             if (markers.Ready) timeline.Year = markers.Timeline.endYear;
             timeline.Apply();
 
@@ -102,24 +121,49 @@ namespace Humen.EditorTools
             cam.clearFlags = CameraClearFlags.SolidColor;
             cam.backgroundColor = new Color(0.016f, 0.027f, 0.043f);   // 深空底色
             cam.nearClipPlane = 0.1f;
-            // 远裁剪面要罩得住月亮（2.6R）与太阳（1.8R）之外的天幕。
-            cam.farClipPlane = 60000f;
-            // ⚠️ 45° 改成 60°：太阳的<b>屏上偏角</b>是 36.8°（SunPhaseDeg = 55°，见 SunMoonSystem
-            //    那一节的取舍表；注意 55 是<b>球心处</b>的相位角，不是屏上偏角，两者别混）。
-            //    60° 的竖直半视锥是 30°、横向 47.2° —— 日盘偏在横向这一侧，留有余量。
-            //    而月亮在 2.6R 轨道上要宽得多，放宽视锥是唯一能松的一档：
-            //    它不改变任何几何关系，只是让更多天空进画面。
+            // 远裁剪面要罩得住<b>日盘本身</b>。v0.28 起太阳在 1012R（真实日地距离按月亮同一个
+            //    压缩倍数缩下来，见 SunMoonSystem 类注释），加日盘半径 108.1R、再加相机最远的
+            //    5R（OrbitCamera.MaxFactor）＝ 1125.1R，取 1300000 留一倍余量。
+            // ⚠️ 旧的 60000 是照着"太阳在 1.8R"写的，那个值现在是错的 —— 不改这里，
+            //    日盘会被远平面直接裁掉，而且<b>不报错</b>，只是"看不见太阳"。
+            //    放大 far <b>不掉深度精度</b>：定点深度缓冲 Δz ≈ z²/(2ⁿ·near)，在 far ≫ z 时与 far
+            //    无关（z=3000、near=0.1、n=24 时两种 far 都是 5.4 单位）—— 决定精度的只有 near，没动。
+            cam.farClipPlane = 1300000f;
+            // ⚠️ 45° 改成 60° 是为了<b>月亮</b>：它在 2.6R 轨道上，放宽视锥是唯一能松的一档 ——
+            //    不改变任何几何关系，只是让更多天空进画面。
+            //    （v0.27 这里写的理由是"日盘屏上偏角 36.8°、横向半视锥 47.2° 留有余量"，
+            //     那个理由 v0.28 作废了：太阳退到 1012R 之后日盘偏角与蓝星相位被
+            //     δ + φ = 180° − ε 锁死，默认机位下 124.86°，日盘在镜头背后 —— 与视锥宽窄无关。）
             cam.fieldOfView = 60f;
 
             var orbit = camGo.AddComponent<OrbitCamera>();
             orbit.Target = planet.transform;
             orbit.Radius = PlanetRadius;
-            orbit.Yaw = -35f;
-            orbit.Pitch = 18f;
+
+            // ⚠ 默认机位<b>不是随手填的欧拉角</b>，对准"部落最多的那块大陆"。
+            //    原先写死 Yaw=−35 / Pitch=18，实测出来第一屏对着的是<b>汪洋与夜半球</b>，
+            //    作者要看的那 197 个部落被挤在画面左下角一小片、还多半在阴影里
+            //    （见 unity_preview.png）。默认机位是这个演示的第一屏 ——
+            //    它对着哪儿，就等于"这个作品展示了什么"。
+            float aimLat = 18f, aimLon = 0f;
+            if (markers.Ready && AimAtMainContinent(markers.World, out float lat, out float lon))
+            {
+                aimLat = lat; aimLon = lon;
+                Debug.Log($"[Humen] 默认机位对准部落最多的大陆：{aimLat:F0}°, {aimLon:F0}°");
+            }
+            orbit.Yaw = 180f + aimLon;       // 由 OrbitCamera 的算式反解：yaw = 180 + lon
+            orbit.Pitch = aimLat;            // 同上：pitch = lat
+
             orbit.DistanceFactor = 3.0f;     // A 级轨道视图
             orbit.MinFactor = 1.005f;        // §10.1 B 级上限，再近就该"降落"了
             orbit.MaxFactor = 5.0f;          // 拉远能同时收进蓝星与月亮
             orbit.ApplyImmediately();
+
+            // ⚠ 相机摆好之后必须<b>再</b> Apply 一次。上面那次 Apply 跑在相机建出来之前，
+            //   而道路线宽按"相机到地表的距离"反比缩放（TradeRouteLayer.SizeZoom）——
+            //   没有相机时它退回 1 倍，烘进场景的就是一个<b>错误的线宽</b>。
+            //   与 PreviewRenderer 里"必须在摆好相机之后再建网格"是同一件事。
+            timeline.Apply();
 
             // ── 交互 ─────────────────────────────────────────────
             // 拨地球（左键）+ 自转开关（R）。挂在蓝星上，转的是蓝星自己。
@@ -142,6 +186,47 @@ namespace Humen.EditorTools
         }
 
         /// <summary>
+        /// 求出"部落最多的那块大陆"上有人的地方（该大陆诸部落的<b>方向平均</b>），
+        /// 再用 <see cref="PlanetGeometry.NormalAt"/> 的逆式解回经纬度。
+        ///
+        /// 为什么要质心而不是大陆的几何中心：几何中心可能是<b>一片秃地或内海</b>
+        /// —— 实测北温带大陆的几何中心就没人住，对着它开场等于白开。
+        ///
+        /// 逆式：<c>n = (cosLat·sin lon, sinLat, cosLat·cos lon)</c>
+        /// ⟹ <c>lat = asin(n.y)</c>、<c>lon = atan2(n.x, n.z)</c>。
+        /// </summary>
+        private static bool AimAtMainContinent(WorldView world, out float lat, out float lon)
+        {
+            lat = 0f; lon = 0f;
+            if (world == null || !world.Loaded) return false;
+
+            // 每块大陆各有多少部落、方向之和是多少
+            var counts = new System.Collections.Generic.Dictionary<int, int>();
+            var sums = new System.Collections.Generic.Dictionary<int, Vector3>();
+            foreach (var t in world.File.tribes)
+            {
+                if (t == null) continue;
+                counts.TryGetValue(t.continentId, out int c);
+                counts[t.continentId] = c + 1;
+                sums.TryGetValue(t.continentId, out Vector3 s);
+                sums[t.continentId] = s + PlanetGeometry.NormalAt(t.lat, t.lon);
+            }
+
+            int best = -1, bestN = 0;
+            foreach (var kv in counts)
+                if (kv.Value > bestN || (kv.Value == bestN && kv.Key < best)) { bestN = kv.Value; best = kv.Key; }
+            if (best < 0) return false;
+
+            Vector3 sum = sums[best];
+            if (sum.sqrMagnitude < 1e-6f) return false;
+            sum.Normalize();
+
+            lat = Mathf.Asin(Mathf.Clamp(sum.y, -1f, 1f)) * Mathf.Rad2Deg;
+            lon = Mathf.Atan2(sum.x, sum.z) * Mathf.Rad2Deg;
+            return true;
+        }
+
+        /// <summary>
         /// 把部落图层的四个材质存成<b>资产文件</b>。
         ///
         /// 不这么做的话，<c>TribeMarkerLayer</c> 每次运行新建的材质会成为"场景内嵌对象"，
@@ -151,12 +236,31 @@ namespace Humen.EditorTools
         /// </summary>
         private static void EnsureMarkerMaterialAssets()
         {
-            System.IO.Directory.CreateDirectory(MarkerMaterials.Folder);
+            EnsureMaterialAssets(MarkerMaterials.Folder, MarkerMaterials.AssetNames, MarkerMaterials.Colors);
+            EnsureMaterialAssets(TradeRouteMaterials.Folder, TradeRouteMaterials.AssetNames, TradeRouteMaterials.Colors);
+            EnsureMaterialAssets(TerritoryMaterials.Folder, TerritoryMaterials.AssetNames, TerritoryMaterialColors());
+        }
 
-            for (int i = 0; i < MarkerMaterials.AssetNames.Length; i++)
+        /// <summary>疆域四档的颜色由 <see cref="TerritoryMaterials.ColorFor"/> 生成（标记色 + 低不透明度）。</summary>
+        private static Color[] TerritoryMaterialColors()
+        {
+            var c = new Color[TerritoryMaterials.AssetNames.Length];
+            for (int i = 0; i < c.Length; i++) c[i] = TerritoryMaterials.ColorFor(i);
+            return c;
+        }
+
+        /// <summary>
+        /// 把一组材质存成资产文件。三个图层共用这一份实现 ——
+        /// 各写一遍的话，"已存在时要更新而不是跳过"那条教训（见下面）迟早会在新副本里丢掉。
+        /// </summary>
+        public static void EnsureMaterialAssets(string folder, string[] names, Color[] colors)
+        {
+            System.IO.Directory.CreateDirectory(folder);
+
+            for (int i = 0; i < names.Length; i++)
             {
-                string path = $"{MarkerMaterials.Folder}/{MarkerMaterials.AssetNames[i]}";
-                var color = MarkerMaterials.Colors[i];
+                string path = $"{folder}/{names[i]}";
+                var color = colors[i];
 
                 var existing = AssetDatabase.LoadAssetAtPath<Material>(path);
                 if (existing != null)
@@ -177,7 +281,7 @@ namespace Humen.EditorTools
                 }
 
                 var mat = MarkerMaterials.Create(color);
-                mat.name = MarkerMaterials.AssetNames[i];
+                mat.name = names[i];
                 AssetDatabase.CreateAsset(mat, path);
             }
             AssetDatabase.SaveAssets();
